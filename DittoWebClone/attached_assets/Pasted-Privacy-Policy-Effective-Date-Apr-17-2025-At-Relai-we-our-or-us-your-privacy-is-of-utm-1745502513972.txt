@@ -1,0 +1,36 @@
+Privacy Policy
+Effective Date: Apr 17, 2025.
+At Relai ("we", "our", or "us"), your privacy is of utmost importance. This Privacy Policy outlines how we collect, use, disclose, and safeguard your personal information when you use our services, including through our website, calls, mobile applications, and AI-powered real estate advisory tools (collectively, the "Services").
+1. Information We Collect
+a. Information You Provide:
+Name, email address, phone number, and other contact details
+Property preferences, budget, and location interests
+Documents related to property buying or investment (if voluntarily submitted)
+b. Information Collected Automatically:
+Device information (e.g., IP address, browser type, device type)
+Usage data (e.g., pages viewed, actions taken, interaction patterns)
+Location data (if permission is granted)
+c. Third-Party Data:
+Data shared via integrations with social media or authentication platforms
+Property listings and market insights obtained from trusted partners and public real estate registries (e.g., RERA)
+2. How We Use Your Information
+To deliver personalized property recommendations using AI tools
+To respond to inquiries and provide customer support
+To improve the performance, functionality, and user experience of our Services
+To communicate updates, promotions, or relevant property insights
+For legal, security, and compliance purposes
+3. How We Share Your Information
+With trusted real estate developers and service partners for fulfilling your property requirements
+With financial institutions (only with consent) for home loan facilitation
+With legal and registration advisors (as part of our end-to-end support, if you opt for it)
+As required by law, regulation, or legal process
+4. Data Security We implement reasonable technical and organizational measures to protect your information from unauthorized access, disclosure, alteration, or destruction. However, no method of transmission over the internet or electronic storage is 100% secure.
+5. Your Choices and Rights
+You can request data deletion or limitation of data processing by contacting us.
+6. Children’s Privacy Our Services are not intended for individuals under the age of 18. We do not knowingly collect personal data from children without parental consent.
+7. Changes to This Policy We may update this Privacy Policy from time to time. We will notify you of material changes by updating the "Effective Date" at the top of this page or through other appropriate means.
+8. Contact Us If you have any questions or concerns regarding this Privacy Policy or our data practices, you may contact us at:
+Relai Technologies Private Limited
+Email: connect@relai.world
+By using our Services, you agree to the terms of this Privacy Policy.
+
