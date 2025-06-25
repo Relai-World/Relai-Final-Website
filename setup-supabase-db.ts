@@ -40,7 +40,6 @@ async function main() {
     await db.execute(`
       CREATE TABLE IF NOT EXISTS properties (
         id SERIAL PRIMARY KEY,
-        property_id TEXT NOT NULL UNIQUE,
         developer_name TEXT,
         rera_number TEXT,
         project_name TEXT NOT NULL,
