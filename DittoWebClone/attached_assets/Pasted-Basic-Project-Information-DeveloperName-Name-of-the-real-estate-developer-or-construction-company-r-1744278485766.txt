@@ -1,0 +1,57 @@
+Basic Project Information
+DeveloperName: Name of the real estate developer or construction company responsible for building the project.
+
+RERA_Number: The registration number of the project or developer under the RERA Act (Real Estate Regulatory Authority) which ensures transparency and accountability in real estate.
+
+🔹 Project Identity & Status
+ProjectName: The marketing or official name of the real estate project.
+
+ConstructionStatus: Indicates the current phase of the project — e.g., Pre-Launch, Under Construction, Ready to Move, Completed.
+
+PropertyType: The type of property being developed — e.g., Apartment, Villa, Plot, Commercial Office, Retail Space.
+
+Location: The geographical location or address of the project — typically includes area, city, and sometimes landmarks or postal code.
+
+PossessionDate: The expected or promised date when the property will be ready for the buyer to take possession.
+
+🔹 Community and Scale
+IsGatedCommunity: Boolean value (Yes/No or True/False) indicating if the property is in a gated society or township.
+
+TotalUnits: Total number of individual units (flats, villas, etc.) in the project.
+
+AreaSizeAcres: Total land area of the project in acres.
+
+🔹 Configuration & Dimensions
+Configurations: Available formats of homes such as 1BHK, 2BHK, 3BHK, etc.
+
+MinSizeSqft: Minimum built-up or carpet area of units in square feet.
+
+MaxSizeSqft: Maximum size of units in square feet.
+
+PricePerSqft: Cost per square foot as quoted by the builder or developer.
+
+PricePerSqftOTP: "On-the-Property" price per square foot – may include floor-rise charges, PLC, or other on-site pricing adjustments.
+
+🔹 Geo & Source Info
+Longitude/Latitude: Geographical coordinates of the project – useful for maps, location APIs, or geotagging.
+
+ProjectDocumentsLink: A URL or cloud link where documents like floor plans, RERA certificate, brochures, and legal approvals can be accessed.
+
+Source: Origin of the listing data — e.g., Official Website, Broker, Real Estate Portal, Developer's Sales Office.
+
+🔹 Contact & Sales Info
+BuilderContactInfo: Contact details for the developer or their sales representative.
+
+ListingType: Indicates whether the listing is Direct from Builder, Resale, Exclusive, Broker Listed, etc.
+
+LoanApprovedBanks: Names of banks or financial institutions that have approved loans for this project.
+
+🔹 Contextual & Supporting Info
+NearbyLocations: Key landmarks or localities near the project — useful for understanding connectivity and social infrastructure.
+
+RemarksComments: Any specific notes, disclaimers, or unique selling points the listing may include.
+
+Amenities: Facilities available in the project — e.g., Clubhouse, Swimming Pool, Gym, Security, Kids’ Play Area, Park.
+
+FAQ: Commonly asked questions about the project — could include queries about possession, legal approvals, payment plans, etc.
+

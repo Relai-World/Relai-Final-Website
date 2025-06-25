@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="78" height="32" viewBox="0 0 78 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M7.58 5.24H12.62V22.48H7.58V5.24Z" fill="white"/>
+  <path d="M15.6 22.48V5.24H20.64V18.44H29.72V22.48H15.6Z" fill="white"/>
+  <path d="M32.48 22.48V5.24H47.24V9.28H37.52V11.8H46.28V15.84H37.52V18.44H47.24V22.48H32.48Z" fill="white"/>
+  <path d="M50 22.48V5.24H55.04V18.44H64.12V22.48H50Z" fill="white"/>
+  <path d="M66.88 18.52C66.88 16.88 68.22 15.54 69.86 15.54C71.5 15.54 72.84 16.88 72.84 18.52C72.84 20.16 71.5 21.5 69.86 21.5C68.22 21.5 66.88 20.16 66.88 18.52Z" fill="white"/>
+  <circle cx="70" cy="18.5" r="3.5" fill="white"/>
+</svg>
