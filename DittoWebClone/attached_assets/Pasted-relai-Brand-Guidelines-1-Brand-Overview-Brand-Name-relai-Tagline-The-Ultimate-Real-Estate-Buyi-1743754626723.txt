@@ -1,0 +1,78 @@
+relai — Brand Guidelines
+
+1. Brand Overview
+Brand Name: relai
+Tagline: The Ultimate Real Estate Buying Experience (work-in-progress)
+Brand Purpose: To empower home buyers, sellers, and investors with data-driven insights, seamless property transactions, and expert guidance. We aim to deliver a transparent, efficient, and hassle-free real estate experience.
+
+2. Logo Usage
+Primary Logo: "relai." in lowercase with a period at the end. Uses clean, modern sans-serif typography.
+Logo Variants:
+Standard (horizontal) logo
+Icon version (TBD - suggested: stylized "r." or geometric shape inspired by the logo)
+Clear Space: Maintain a minimum padding equal to the height of the letter "r" around the logo.
+Minimum Size: Ensure legibility across digital and print formats.
+Do's:
+Use logo on clean, uncluttered backgrounds
+Respect logo spacing and proportions
+Don'ts:
+Don’t stretch or skew the logo
+Don’t place on clashing backgrounds
+Don’t change logo colors arbitrarily
+
+3. Color Palette
+Primary Colors:
+relai Blue: #007AFF
+Light Greyish White: #F2F2F2
+Accent Colors:
+Deep Charcoal: #2C2C2E
+Use for body text, iconography, and subtle dividers for maximum readability and contrast on light backgrounds.
+Soft Beige: #F5F5DC
+Use as background color in section blocks, cards, or light containers to create warmth and visual separation.
+Color Usage Examples:
+Blue text on light background (primary brand)
+Greyish white text on blue background (inverted usage)
+Beige backgrounds to create soft sections or highlight neutral zones
+Deep Charcoal for headings or paragraph text on white or beige
+
+4. Typography
+Primary Typeface: Manrope
+Headings: Manrope Bold
+Subheadings: Manrope SemiBold
+Body Text: Manrope Regular / Light
+Reasons:
+Clean, modern, and highly legible
+Balances professionalism with approachability
+Custom Font Note: A custom typeface derived from the "relai." logo can be developed. This can be explored as a future brand asset.
+
+5. Voice & Tone
+Tone: Professional, Calm, Insightful, Trustworthy
+Guidelines:
+Use clear, direct language
+Avoid jargon or overly salesy tone
+Focus on empowerment, simplicity, and guidance
+Examples:
+CTA: "Book your site visit today."
+Social: "We simplify real estate decisions."
+Support: "We’re here to assist you every step of the way."
+
+6. Audience Profile
+Buyer Type: First-time buyers, frequent investors, flippers
+Age: 30–50
+Profession: IT, Business Owners, CXOs, Founders, Govt Employees
+Geography: Telangana (urban), NRIs in USA, Aus, UK, ME, Canada, Singapore
+Lifestyle: High-spending, investment-focused
+Affordability: 50L to 5Cr+
+Intent: 0–12 months buying window
+Pain Points:
+Confused buyers: need data to decide
+Financial barriers: require loan support
+Trust: need legal/due diligence help
+
+7. Usage Examples
+Website: Hero section, navigation logo, footer branding
+Mobile App: Splash screen, favicon, loading screen branding
+Packaging & Docs: Property brochures, legal docs, invoice headers
+Social Media: Profile pic, watermark, post template signature
+Ads: Banner ads, hoardings, digital performance creatives
+

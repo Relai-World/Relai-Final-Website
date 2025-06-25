@@ -1,0 +1,38 @@
+The relai Experience Section Changes -
+
+1. Change relai to Relai
+2. In "Expert Property Guidance" the belwo three buttons should be there. replace the below button with exsisting ones.
+3. Chat with AI advisor (Button Colour would be in Black and text in White)
+4. Book a free expert session (Button Colour would be in Relai Blue and text in White)
+5. Chat with us on WhatsApp (Button Colour would be in Whatsapp Green and text in White)
+6. In End to End Support section, Change the Name to End to End Process Support
+7. In End to End Support section, There is only one button that is "End to End process". Button Colour would be in Relai Blue and text in White. Once clicked on that button a section mentioning all the our end to end process should be visible in the same section. Our End to End Process Includes the below -
+Step 1: Curated Property Recommendations
+We begin by understanding your requirements and shortlist 1 to 3 properties that best match your needs.
+
+Step 2: Property Visits & Virtual Tours
+Our team arranges physical site visits for you. If you're an NRI, we also provide live video tours so you can explore the properties remotely.
+
+Step 3: Property Selection
+Once you’ve reviewed the options, you finalize the property that suits you best.
+
+Step 4: Legal Due Diligence
+We conduct a comprehensive legal verification of the property through authorized third-party legal firms and share the documentation with you.
+
+Step 5: Home Loan Assistance (if applicable)
+If you're planning to purchase the property through a loan, we handle the entire loan application and processing on your behalf.
+
+Step 6: Token Payment
+You proceed with paying the token amount to reserve the property.
+
+Step 7: Agreement of Sale (AOS)
+We walk you through the Agreement of Sale, explain all key details, and assist with the signing process.
+
+Step 8: Property Registration Support
+One of our dedicated executives will accompany you to the Sub-Registrar Office to support you throughout the registration process.
+
+Step 9: Post-Purchase Assistance
+Our support doesn’t end at registration. We provide continued assistance with any post-purchase requirements.
+
+Use icons and infogrpahics and make a section for this
+
