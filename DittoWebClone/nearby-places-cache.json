@@ -2633,5 +2633,451 @@
         }
       ]
     }
+  },
+  "17.3456,78.4203": {
+    "timestamp": 1750921779116,
+    "data": {
+      "amenities": [
+        {
+          "type": "Hospitals",
+          "count": 10,
+          "places": [
+            {
+              "name": "Human Touch Hospital",
+              "distance": "1.8 km",
+              "duration": "7 mins",
+              "rating": 4
+            },
+            {
+              "name": "Sunshine Dental Hospital",
+              "distance": "2.3 km",
+              "duration": "7 mins",
+              "rating": 4.9
+            },
+            {
+              "name": "Safe Kids Hospitals / Avighna Births",
+              "distance": "4.6 km",
+              "duration": "12 mins",
+              "rating": 4.8
+            },
+            {
+              "name": "Iris Eye Hospital",
+              "distance": "4.9 km",
+              "duration": "13 mins",
+              "rating": 4.8
+            },
+            {
+              "name": "Zoi Hospitals, Attapur",
+              "distance": "5.1 km",
+              "duration": "15 mins",
+              "rating": 4.6
+            },
+            {
+              "name": "Mythri Hospital Mehdipatnam",
+              "distance": "5.6 km",
+              "duration": "11 mins",
+              "rating": 4.6
+            },
+            {
+              "name": "Emory Multi-Speciality Hospital",
+              "distance": "6.1 km",
+              "duration": "18 mins",
+              "rating": 4.8
+            },
+            {
+              "name": "Majestic Hospital",
+              "distance": "6.1 km",
+              "duration": "16 mins",
+              "rating": 4.8
+            },
+            {
+              "name": "Radhika Reddy Dental Clinic",
+              "distance": "7.2 km",
+              "duration": "20 mins",
+              "rating": 4
+            },
+            {
+              "name": "QRRC",
+              "distance": "7.2 km",
+              "duration": "20 mins",
+              "rating": 4.8
+            }
+          ]
+        },
+        {
+          "type": "Shopping Malls",
+          "count": 3,
+          "places": [
+            {
+              "name": "Mantra Mall",
+              "distance": "2.2 km",
+              "duration": "8 mins",
+              "rating": 4.1
+            },
+            {
+              "name": "MCube Mall",
+              "distance": "5.5 km",
+              "duration": "15 mins",
+              "rating": 4
+            },
+            {
+              "name": "IB MAll",
+              "distance": "7.8 km",
+              "duration": "22 mins",
+              "rating": 4.5
+            }
+          ]
+        },
+        {
+          "type": "Schools",
+          "count": 5,
+          "places": [
+            {
+              "name": "HPS Schools Upparpally",
+              "distance": "1.0 km",
+              "duration": "6 mins",
+              "rating": 4.7
+            },
+            {
+              "name": "TIME Kids Preschool, Upparpally, Hyderabad",
+              "distance": "2.0 km",
+              "duration": "8 mins",
+              "rating": 4.8
+            },
+            {
+              "name": "Krishnaveni Talent School",
+              "distance": "3.7 km",
+              "duration": "11 mins",
+              "rating": 4.1
+            },
+            {
+              "name": "Passion Roller Skating Academy",
+              "distance": "6.0 km",
+              "duration": "17 mins",
+              "rating": 4.8
+            },
+            {
+              "name": "Baalyam Pre School and Daycare",
+              "distance": "7.5 km",
+              "duration": "22 mins",
+              "rating": 4.7
+            }
+          ]
+        },
+        {
+          "type": "Restaurants",
+          "count": 8,
+          "places": [
+            {
+              "name": "Subway Naidu Colony Upperpally",
+              "distance": "2.2 km",
+              "duration": "8 mins",
+              "rating": 4
+            },
+            {
+              "name": "Hotel Kinara Grand",
+              "distance": "5.2 km",
+              "duration": "14 mins",
+              "rating": 4.1
+            },
+            {
+              "name": "Pizza Hut | Attapur, Hyderabad",
+              "distance": "5.5 km",
+              "duration": "15 mins",
+              "rating": 4
+            },
+            {
+              "name": "Meat Hub.in Nonveg Supermarket",
+              "distance": "7.2 km",
+              "duration": "20 mins",
+              "rating": 4.1
+            },
+            {
+              "name": "DRAGON'S FOOD COURT",
+              "distance": "7.4 km",
+              "duration": "19 mins",
+              "rating": 4.2
+            },
+            {
+              "name": "SRI SRINIVASA MIRCHI",
+              "distance": "8.1 km",
+              "duration": "19 mins",
+              "rating": 4.1
+            },
+            {
+              "name": "A-1 Fast Food",
+              "distance": "8.6 km",
+              "duration": "16 mins",
+              "rating": 4.4
+            },
+            {
+              "name": "Dolphin Hotel",
+              "distance": "10.9 km",
+              "duration": "22 mins",
+              "rating": 4.1
+            }
+          ]
+        },
+        {
+          "type": "Supermarkets",
+          "count": 2,
+          "places": [
+            {
+              "name": "Balaji Grand Bazar",
+              "distance": "4.4 km",
+              "duration": "12 mins",
+              "rating": 4.2
+            },
+            {
+              "name": "Sri Balaji Super Market",
+              "distance": "5.1 km",
+              "duration": "11 mins",
+              "rating": 4.2
+            }
+          ]
+        },
+        {
+          "type": "IT Companies",
+          "count": 0,
+          "places": []
+        }
+      ],
+      "transitPoints": [
+        {
+          "name": "TSPA EXIT TOLL PLAZA, EXIT NO 18",
+          "distance": "10.3 km",
+          "duration": "17 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Ring Road Interchange",
+          "distance": "10.7 km",
+          "duration": "19 mins",
+          "type": "highway"
+        },
+        {
+          "name": "TGPA Junction ORR Entry 18 Tollbooth",
+          "distance": "10.9 km",
+          "duration": "19 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Lakdi-ka-pul",
+          "distance": "11.9 km",
+          "duration": "24 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Hyderabad",
+          "distance": "12.5 km",
+          "duration": "29 mins",
+          "type": "train"
+        },
+        {
+          "name": "Gandhi Bhavan",
+          "distance": "13.1 km",
+          "duration": "28 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Toll plaza Entry",
+          "distance": "13.2 km",
+          "duration": "20 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Nehru ORR Entry - 16",
+          "distance": "13.2 km",
+          "duration": "20 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Assembly",
+          "distance": "13.4 km",
+          "duration": "28 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Osmania Medical College",
+          "distance": "13.6 km",
+          "duration": "30 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Mahatma Gandhi (MGBS)",
+          "distance": "13.9 km",
+          "duration": "33 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Punjagutta",
+          "distance": "14.0 km",
+          "duration": "29 mins",
+          "type": "metro"
+        },
+        {
+          "name": "ORR Narsingi Exit Toll Gate - 18A",
+          "distance": "14.2 km",
+          "duration": "20 mins",
+          "type": "highway"
+        },
+        {
+          "name": "MG Bus Station",
+          "distance": "14.3 km",
+          "duration": "32 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Malakpet",
+          "distance": "14.4 km",
+          "duration": "31 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Begumpet",
+          "distance": "15.2 km",
+          "duration": "33 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Nehru ORR Toll Booth",
+          "distance": "15.2 km",
+          "duration": "24 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Ameerpet",
+          "distance": "15.3 km",
+          "duration": "33 mins",
+          "type": "metro"
+        },
+        {
+          "name": "New Market",
+          "distance": "15.5 km",
+          "duration": "34 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Nehru ORR Entry - 16 ( towards gachibowli, patancheru)",
+          "distance": "15.6 km",
+          "duration": "25 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Madhapur",
+          "distance": "15.7 km",
+          "duration": "36 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Toll entry gate shamshabad - gachibowli main",
+          "distance": "15.7 km",
+          "duration": "25 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Road No. 5 Jubilee Hills",
+          "distance": "15.8 km",
+          "duration": "36 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Yusufguda",
+          "distance": "15.9 km",
+          "duration": "38 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Musarambagh",
+          "distance": "16.5 km",
+          "duration": "36 mins",
+          "type": "metro"
+        },
+        {
+          "name": "ORR Narsingi Entry Toll Gate - 18A",
+          "distance": "16.6 km",
+          "duration": "25 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Toll Booth Bengaluru Highway ORR Exit (Exit 16)",
+          "distance": "16.6 km",
+          "duration": "26 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Gandhi Hospital",
+          "distance": "17.3 km",
+          "duration": "36 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Peddamma Gudi",
+          "distance": "17.9 km",
+          "duration": "39 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Nehru ORR Exit - 1 (towards Vattinagulapally)",
+          "distance": "18.3 km",
+          "duration": "24 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Kokapet Toll Plaza",
+          "distance": "18.4 km",
+          "duration": "23 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Secunderabad East Metro Station",
+          "distance": "18.6 km",
+          "duration": "40 mins",
+          "type": "metro"
+        },
+        {
+          "name": "ORR Exit Toll Booth at TSPA",
+          "distance": "20.5 km",
+          "duration": "30 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Thukkuguda ORR Toll Gate",
+          "distance": "28.3 km",
+          "duration": "34 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Outer Ring Road Toll Booth Exit 3",
+          "distance": "38.8 km",
+          "duration": "40 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR EXIT 14",
+          "distance": "39.2 km",
+          "duration": "43 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Exit 4A",
+          "distance": "53.4 km",
+          "duration": "53 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Exit Number 4",
+          "distance": "59.1 km",
+          "duration": "59 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Entry 8 outside",
+          "distance": "77.0 km",
+          "duration": "1 hour 11 mins",
+          "type": "highway"
+        }
+      ]
+    }
   }
 }
