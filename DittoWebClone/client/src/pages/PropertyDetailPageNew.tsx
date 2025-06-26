@@ -470,10 +470,10 @@ export default function PropertyDetailPageNew() {
                   )}
                 </TabsContent>
                 <TabsContent value="nearby" className="p-5">
-                  {property.latitude && property.longitude ? (
+                  {(property.latitude && property.longitude) || (geoCoords && geoCoords.lat && geoCoords.lon) ? (
                     <PropertyNearbyPlaces 
-                      latitude={property.latitude} 
-                      longitude={property.longitude}
+                      latitude={property.latitude ?? geoCoords?.lat!} 
+                      longitude={property.longitude ?? geoCoords?.lon!}
                       propertyName={property.projectName || property.name}
                     />
                   ) : (
@@ -483,10 +483,10 @@ export default function PropertyDetailPageNew() {
                   )}
                 </TabsContent>
                 <TabsContent value="aqi" className="p-5">
-                  {property.latitude && property.longitude ? (
+                  {(property.latitude && property.longitude) || (geoCoords && geoCoords.lat && geoCoords.lon) ? (
                     <PropertyAirQuality 
-                      latitude={property.latitude} 
-                      longitude={property.longitude}
+                      latitude={property.latitude ?? geoCoords?.lat!} 
+                      longitude={property.longitude ?? geoCoords?.lon!}
                       propertyName={property.projectName || property.name}
                       location={property.location}
                     />
