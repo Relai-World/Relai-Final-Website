@@ -223,7 +223,7 @@ export default function AllPropertiesPage() {
         );
       } else {
         // Use the standard API endpoint
-        const endpoint = 'http://localhost:5000/api/all-properties'; // Updated to absolute URL
+        const endpoint = 'http://localhost:5001/api/all-properties'; // Updated to absolute URL
         console.log(`Using standard properties endpoint`);
         // Build query params only for real values
         const params = new URLSearchParams();
