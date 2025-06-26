@@ -1831,5 +1831,909 @@
         }
       ]
     }
+  },
+  "17.4065,78.4772": {
+    "timestamp": 1750926259878,
+    "data": {
+      "amenities": [
+        {
+          "type": "Hospitals",
+          "count": 9,
+          "places": [
+            {
+              "name": "Dr Saxena Scan Centre",
+              "distance": "1.9 km",
+              "duration": "4 mins",
+              "rating": 4.2
+            },
+            {
+              "name": "Fernandez Hospital - Bogulkunta (Unit 1)",
+              "distance": "2.0 km",
+              "duration": "7 mins",
+              "rating": 4.5
+            },
+            {
+              "name": "Lotus Hospitals for Women & Children | Lakdikapul",
+              "distance": "3.1 km",
+              "duration": "8 mins",
+              "rating": 4
+            },
+            {
+              "name": "CARE Hospitals Nampally",
+              "distance": "3.1 km",
+              "duration": "8 mins",
+              "rating": 4.5
+            },
+            {
+              "name": "VIVEKANANDA HEALTH CENTRE, Ramakrishna Math, Hyderabad",
+              "distance": "3.7 km",
+              "duration": "9 mins",
+              "rating": 4.3
+            },
+            {
+              "name": "CARE Hospitals, Banjara Hills",
+              "distance": "4.8 km",
+              "duration": "13 mins",
+              "rating": 4.5
+            },
+            {
+              "name": "Good Will Kidney & Surgical Center",
+              "distance": "5.3 km",
+              "duration": "17 mins",
+              "rating": 4.7
+            },
+            {
+              "name": "Yashoda Hospitals - Secunderabad",
+              "distance": "5.5 km",
+              "duration": "16 mins",
+              "rating": 4.7
+            },
+            {
+              "name": "KIMS - Sunshine Hospitals, Begumpet",
+              "distance": "5.7 km",
+              "duration": "14 mins",
+              "rating": 4.8
+            }
+          ]
+        },
+        {
+          "type": "Shopping Malls",
+          "count": 9,
+          "places": [
+            {
+              "name": "PRASADS MULTIPLEX NEW PARKING",
+              "distance": "2.1 km",
+              "duration": "5 mins",
+              "rating": 4.4
+            },
+            {
+              "name": "Next PREMIA",
+              "distance": "4.0 km",
+              "duration": "10 mins",
+              "rating": 4.1
+            },
+            {
+              "name": "PVR Mall",
+              "distance": "4.9 km",
+              "duration": "13 mins",
+              "rating": 4.4
+            },
+            {
+              "name": "City Center Mall",
+              "distance": "5.1 km",
+              "duration": "14 mins",
+              "rating": 4.2
+            },
+            {
+              "name": "MPM Timesquare Mall",
+              "distance": "5.1 km",
+              "duration": "14 mins",
+              "rating": 4
+            },
+            {
+              "name": "GVK One Mall",
+              "distance": "5.3 km",
+              "duration": "15 mins",
+              "rating": 4.3
+            },
+            {
+              "name": "INOX GVK One",
+              "distance": "5.4 km",
+              "duration": "16 mins",
+              "rating": 4.3
+            },
+            {
+              "name": "Hyderabad Central",
+              "distance": "5.5 km",
+              "duration": "14 mins",
+              "rating": 4.1
+            },
+            {
+              "name": "AAA mall",
+              "distance": "7.1 km",
+              "duration": "18 mins",
+              "rating": 4.1
+            }
+          ]
+        },
+        {
+          "type": "Schools",
+          "count": 5,
+          "places": [
+            {
+              "name": "HPS-Hyderabad Public School",
+              "distance": "1.7 km",
+              "duration": "5 mins",
+              "rating": 4.5
+            },
+            {
+              "name": "La Excellence IAS Academy - Best UPSC Coaching in Hyderabad | Best IAS Coaching Centre in Hyderabad | Degree with IAS",
+              "distance": "4.1 km",
+              "duration": "10 mins",
+              "rating": 4.5
+            },
+            {
+              "name": "Greenwood Kindergarten",
+              "distance": "4.4 km",
+              "duration": "12 mins",
+              "rating": 5
+            },
+            {
+              "name": "Regency College of Culinary Arts & Hotel Management",
+              "distance": "4.4 km",
+              "duration": "13 mins",
+              "rating": 4.7
+            },
+            {
+              "name": "First Academy - Best IELTS, GRE, SAT, OET, DET, PTE, TOEFL Coaching Center in Ameerpet, Hyderabad Online & Offline Classes",
+              "distance": "6.6 km",
+              "duration": "18 mins",
+              "rating": 4.8
+            }
+          ]
+        },
+        {
+          "type": "Restaurants",
+          "count": 14,
+          "places": [
+            {
+              "name": "Hotel Megha City",
+              "distance": "0.7 km",
+              "duration": "4 mins",
+              "rating": 4.2
+            },
+            {
+              "name": "Hampshire Plaza Hotel",
+              "distance": "1.6 km",
+              "duration": "5 mins",
+              "rating": 4
+            },
+            {
+              "name": "Taj Mahal Hotel",
+              "distance": "1.8 km",
+              "duration": "5 mins",
+              "rating": 4.2
+            },
+            {
+              "name": "Grand Hotel",
+              "distance": "2.2 km",
+              "duration": "5 mins",
+              "rating": 4.1
+            },
+            {
+              "name": "Best Western Ashoka ( Hotel & AC Banquets)",
+              "distance": "2.4 km",
+              "duration": "6 mins",
+              "rating": 4.1
+            },
+            {
+              "name": "Taj Mahal Hotel, Narayanaguda",
+              "distance": "2.6 km",
+              "duration": "8 mins",
+              "rating": 4
+            },
+            {
+              "name": "Parampara - Flavours Of India",
+              "distance": "4.5 km",
+              "duration": "12 mins",
+              "rating": 4.6
+            },
+            {
+              "name": "Barbeque Nation - Banjara Hills",
+              "distance": "4.5 km",
+              "duration": "12 mins",
+              "rating": 4.2
+            },
+            {
+              "name": "Hotel Inner Circle",
+              "distance": "4.6 km",
+              "duration": "13 mins",
+              "rating": 4.1
+            },
+            {
+              "name": "Hotel Annapoorna Residency - Curry Pot, Best Hotel in Hyderabad",
+              "distance": "4.7 km",
+              "duration": "12 mins",
+              "rating": 4.2
+            },
+            {
+              "name": "Tabla Pride Hotel & Spa",
+              "distance": "5.0 km",
+              "duration": "15 mins",
+              "rating": 4
+            },
+            {
+              "name": "Bikanervala | Banjara Hills",
+              "distance": "5.0 km",
+              "duration": "13 mins",
+              "rating": 4.2
+            },
+            {
+              "name": "Marigold Hotel",
+              "distance": "6.5 km",
+              "duration": "17 mins",
+              "rating": 4.4
+            },
+            {
+              "name": "10 Downing Street - Begumpet",
+              "distance": "7.0 km",
+              "duration": "18 mins",
+              "rating": 4.2
+            }
+          ]
+        },
+        {
+          "type": "Supermarkets",
+          "count": 3,
+          "places": [
+            {
+              "name": "BOMBAY STORES",
+              "distance": "2.3 km",
+              "duration": "7 mins",
+              "rating": 4.2
+            },
+            {
+              "name": "RCM Wonder World",
+              "distance": "4.1 km",
+              "duration": "12 mins",
+              "rating": 4.3
+            },
+            {
+              "name": "QUALITY MART",
+              "distance": "5.9 km",
+              "duration": "18 mins",
+              "rating": 4.6
+            }
+          ]
+        },
+        {
+          "type": "IT Companies",
+          "count": 0,
+          "places": []
+        }
+      ],
+      "transitPoints": [
+        {
+          "name": "Assembly",
+          "distance": "2.0 km",
+          "duration": "5 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Lakdi-ka-pul",
+          "distance": "2.3 km",
+          "duration": "6 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Hyderabad",
+          "distance": "3.0 km",
+          "duration": "10 mins",
+          "type": "train"
+        },
+        {
+          "name": "MG Bus Station",
+          "distance": "4.5 km",
+          "duration": "12 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Paradise",
+          "distance": "5.9 km",
+          "duration": "16 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Ameerpet",
+          "distance": "6.0 km",
+          "duration": "16 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Secunderabad East Metro Station",
+          "distance": "6.1 km",
+          "duration": "17 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Prakash Nagar",
+          "distance": "6.4 km",
+          "duration": "15 mins",
+          "type": "metro"
+        },
+        {
+          "name": "S R Nagar",
+          "distance": "6.6 km",
+          "duration": "18 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Musarambagh",
+          "distance": "6.7 km",
+          "duration": "18 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Road No. 5 Jubilee Hills",
+          "distance": "7.9 km",
+          "duration": "21 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Yusufguda",
+          "distance": "8.1 km",
+          "duration": "23 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Moosapet",
+          "distance": "10.4 km",
+          "duration": "26 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Victoria Memorial",
+          "distance": "10.6 km",
+          "duration": "27 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Bharat Nagar",
+          "distance": "10.7 km",
+          "duration": "27 mins",
+          "type": "metro"
+        },
+        {
+          "name": "L. B. Nagar",
+          "distance": "12.1 km",
+          "duration": "33 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Durgam Cheruvu",
+          "distance": "12.4 km",
+          "duration": "33 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Kukatpally",
+          "distance": "12.5 km",
+          "duration": "31 mins",
+          "type": "metro"
+        },
+        {
+          "name": "HITEC City",
+          "distance": "13.3 km",
+          "duration": "35 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Nagole",
+          "distance": "13.5 km",
+          "duration": "34 mins",
+          "type": "metro"
+        },
+        {
+          "name": "KPHB Colony",
+          "distance": "14.0 km",
+          "duration": "34 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Ring Road Interchange",
+          "distance": "17.0 km",
+          "duration": "38 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Narsingi Entry Toll Gate - 18A",
+          "distance": "17.7 km",
+          "duration": "39 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Nehru ORR Exit - 1 (towards Vattinagulapally)",
+          "distance": "21.1 km",
+          "duration": "41 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Kokapet Toll Plaza",
+          "distance": "21.2 km",
+          "duration": "40 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Exit Toll Booth at TSPA",
+          "distance": "21.6 km",
+          "duration": "43 mins",
+          "type": "highway"
+        },
+        {
+          "name": "TSPA EXIT TOLL PLAZA, EXIT NO 18",
+          "distance": "22.1 km",
+          "duration": "37 mins",
+          "type": "highway"
+        },
+        {
+          "name": "TGPA Junction ORR Entry 18 Tollbooth",
+          "distance": "22.7 km",
+          "duration": "38 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Hyderabad East",
+          "distance": "25.0 km",
+          "duration": "55 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Nehru ORR Entry - 16",
+          "distance": "25.8 km",
+          "duration": "37 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Toll plaza Entry",
+          "distance": "25.9 km",
+          "duration": "37 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Narsingi Exit Toll Gate - 18A",
+          "distance": "26.0 km",
+          "duration": "40 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Nehru ORR Toll Booth",
+          "distance": "27.0 km",
+          "duration": "43 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Exit No 10 Taramatipet",
+          "distance": "27.4 km",
+          "duration": "57 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Exit 4A",
+          "distance": "27.9 km",
+          "duration": "1 hour 3 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Nehru ORR Entry - 16 ( towards gachibowli, patancheru)",
+          "distance": "28.2 km",
+          "duration": "41 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Toll Booth Bengaluru Highway ORR Exit (Exit 16)",
+          "distance": "28.4 km",
+          "duration": "45 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Ghatkesar Toll Plaza (ORR)",
+          "distance": "39.8 km",
+          "duration": "1 hour 4 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Thukkuguda ORR Toll Gate",
+          "distance": "40.9 km",
+          "duration": "51 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Exit Number 4",
+          "distance": "44.6 km",
+          "duration": "1 hour 9 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR EXIT 14",
+          "distance": "51.9 km",
+          "duration": "1 hour 0 mins",
+          "type": "highway"
+        }
+      ]
+    }
+  },
+  "17.5288,78.3641": {
+    "timestamp": 1750926356060,
+    "data": {
+      "amenities": [
+        {
+          "type": "Hospitals",
+          "count": 10,
+          "places": [
+            {
+              "name": "Dr.Radhika Kandula - Institute of Women Health and Fertility- Best Fertility Specialist In Hyderabad",
+              "distance": "4.6 km",
+              "duration": "12 mins",
+              "rating": 4.4
+            },
+            {
+              "name": "Our Dentist",
+              "distance": "6.0 km",
+              "duration": "18 mins",
+              "rating": 4.9
+            },
+            {
+              "name": "Sireesha Nursing Home",
+              "distance": "6.1 km",
+              "duration": "20 mins",
+              "rating": 4.7
+            },
+            {
+              "name": "LandMark Hospitals",
+              "distance": "6.2 km",
+              "duration": "17 mins",
+              "rating": 4.5
+            },
+            {
+              "name": "Healix Hospital",
+              "distance": "6.2 km",
+              "duration": "19 mins",
+              "rating": 4.3
+            },
+            {
+              "name": "Srikara Hospitals",
+              "distance": "6.2 km",
+              "duration": "19 mins",
+              "rating": 4.6
+            },
+            {
+              "name": "Dr K Sreedhar",
+              "distance": "6.3 km",
+              "duration": "19 mins",
+              "rating": 4.3
+            },
+            {
+              "name": "Rainbow Children’s Hospital & BirthRight, Hyder Nagar, Hyderabad - Best Maternity Hospital",
+              "distance": "6.9 km",
+              "duration": "16 mins",
+              "rating": 4.4
+            },
+            {
+              "name": "Bollaram Primary Health Hospital - Bollaram PHC",
+              "distance": "7.0 km",
+              "duration": "19 mins",
+              "rating": 4.2
+            },
+            {
+              "name": "Homeocare International - Miyapur | Homeopathy Clinic- Miyapur , Hyderabad",
+              "distance": "7.1 km",
+              "duration": "19 mins",
+              "rating": 4.2
+            }
+          ]
+        },
+        {
+          "type": "Shopping Malls",
+          "count": 2,
+          "places": [
+            {
+              "name": "GSM Mall & Multiplex",
+              "distance": "7.9 km",
+              "duration": "23 mins",
+              "rating": 4.2
+            },
+            {
+              "name": "Miyapur Central",
+              "distance": "7.9 km",
+              "duration": "23 mins",
+              "rating": 4.2
+            }
+          ]
+        },
+        {
+          "type": "Schools",
+          "count": 5,
+          "places": [
+            {
+              "name": "Kidz Fun and Learn Play School",
+              "distance": "0.6 km",
+              "duration": "1 min",
+              "rating": 4.8
+            },
+            {
+              "name": "Kids R Ours Playschool",
+              "distance": "0.6 km",
+              "duration": "2 mins",
+              "rating": 4.5
+            },
+            {
+              "name": "Little Legends Play School",
+              "distance": "0.7 km",
+              "duration": "3 mins",
+              "rating": 4.9
+            },
+            {
+              "name": "Firstcry Intellitots Preschool & Daycare - Nizampet, Hyderabad",
+              "distance": "3.3 km",
+              "duration": "8 mins",
+              "rating": 4.4
+            },
+            {
+              "name": "Iris Florets, Pragati Nagar",
+              "distance": "4.8 km",
+              "duration": "14 mins",
+              "rating": 4.8
+            }
+          ]
+        },
+        {
+          "type": "Restaurants",
+          "count": 6,
+          "places": [
+            {
+              "name": "Konaseema Special Non Veg pickles",
+              "distance": "4.6 km",
+              "duration": "14 mins",
+              "rating": 4.1
+            },
+            {
+              "name": "Mirchi Point",
+              "distance": "4.9 km",
+              "duration": "15 mins",
+              "rating": 4.1
+            },
+            {
+              "name": "KFC",
+              "distance": "5.2 km",
+              "duration": "15 mins",
+              "rating": 4
+            },
+            {
+              "name": "Hotel Sitara Grand - Miyapur",
+              "distance": "5.4 km",
+              "duration": "15 mins",
+              "rating": 4
+            },
+            {
+              "name": "Sneha Chicken",
+              "distance": "6.2 km",
+              "duration": "16 mins",
+              "rating": 4.2
+            },
+            {
+              "name": "Chillout sports cafe",
+              "distance": "6.5 km",
+              "duration": "19 mins",
+              "rating": 4
+            }
+          ]
+        },
+        {
+          "type": "Supermarkets",
+          "count": 2,
+          "places": [
+            {
+              "name": "KPN Fresh - Nizampet, Hyderabad",
+              "distance": "0.4 km",
+              "duration": "1 min",
+              "rating": 4.8
+            },
+            {
+              "name": "Anil Kirana & General Stores",
+              "distance": "8.7 km",
+              "duration": "23 mins",
+              "rating": 4.3
+            }
+          ]
+        },
+        {
+          "type": "IT Companies",
+          "count": 0,
+          "places": []
+        }
+      ],
+      "transitPoints": [
+        {
+          "name": "JNTU College",
+          "distance": "5.5 km",
+          "duration": "14 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Miyapur",
+          "distance": "6.2 km",
+          "duration": "16 mins",
+          "type": "metro"
+        },
+        {
+          "name": "ORR Exit 4A",
+          "distance": "6.6 km",
+          "duration": "17 mins",
+          "type": "highway"
+        },
+        {
+          "name": "KPHB Colony",
+          "distance": "7.1 km",
+          "duration": "18 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Kukatpally",
+          "distance": "8.5 km",
+          "duration": "22 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Moosapet",
+          "distance": "9.7 km",
+          "duration": "25 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Bharat Nagar",
+          "distance": "11.1 km",
+          "duration": "29 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Erragadda",
+          "distance": "11.6 km",
+          "duration": "29 mins",
+          "type": "metro"
+        },
+        {
+          "name": "ORR Exit Number 4",
+          "distance": "11.9 km",
+          "duration": "22 mins",
+          "type": "highway"
+        },
+        {
+          "name": "HITEC City",
+          "distance": "12.2 km",
+          "duration": "29 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Raidurg",
+          "distance": "13.0 km",
+          "duration": "30 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Durgam Cheruvu",
+          "distance": "13.2 km",
+          "duration": "32 mins",
+          "type": "metro"
+        },
+        {
+          "name": "S R Nagar",
+          "distance": "13.5 km",
+          "duration": "33 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Begumpet",
+          "distance": "15.9 km",
+          "duration": "40 mins",
+          "type": "metro"
+        },
+        {
+          "name": "ORR Narsingi Entry Toll Gate - 18A",
+          "distance": "19.7 km",
+          "duration": "45 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Nehru ORR Exit - 1 (towards Vattinagulapally)",
+          "distance": "20.4 km",
+          "duration": "43 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Kokapet Toll Plaza",
+          "distance": "20.5 km",
+          "duration": "43 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Nehru ORR Entry 1",
+          "distance": "20.7 km",
+          "duration": "44 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Outer Ring Road Toll Booth Exit 3",
+          "distance": "21.1 km",
+          "duration": "30 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Hyderabad",
+          "distance": "21.2 km",
+          "duration": "58 mins",
+          "type": "train"
+        },
+        {
+          "name": "ORR Exit Toll Booth at TSPA",
+          "distance": "23.0 km",
+          "duration": "45 mins",
+          "type": "highway"
+        },
+        {
+          "name": "TGPA - Toll Plaza",
+          "distance": "23.3 km",
+          "duration": "47 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Ring Road Interchange",
+          "distance": "23.4 km",
+          "duration": "47 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Nehru ORR Entry - 18 (towards gachibowli)",
+          "distance": "23.9 km",
+          "duration": "48 mins",
+          "type": "highway"
+        },
+        {
+          "name": "TGPA Junction ORR Entry 18 Tollbooth",
+          "distance": "24.1 km",
+          "duration": "48 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Rajendra Toll Exit (Exit 17)",
+          "distance": "26.3 km",
+          "duration": "48 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Narsingi Exit Toll Gate - 18A",
+          "distance": "27.6 km",
+          "duration": "52 mins",
+          "type": "highway"
+        },
+        {
+          "name": "TSPA EXIT TOLL PLAZA, EXIT NO 18",
+          "distance": "30.3 km",
+          "duration": "53 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR plaza",
+          "distance": "32.8 km",
+          "duration": "42 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Nehru ORR Exit - 1 (Financial district)",
+          "distance": "40.9 km",
+          "duration": "45 mins",
+          "type": "highway"
+        }
+      ]
+    }
   }
 }

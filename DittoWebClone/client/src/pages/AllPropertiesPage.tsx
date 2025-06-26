@@ -267,6 +267,7 @@ export default function AllPropertiesPage() {
       constructionStatuses: string[];
       priceRange: { min: number; max: number };
     } }>('/api/filter-options'),
+
   });
   
   // Get filter options from API response or use defaults
