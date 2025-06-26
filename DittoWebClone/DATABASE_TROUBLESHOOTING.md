@@ -29,7 +29,7 @@ Start the server and check the database status:
 npm run dev
 ```
 
-Then visit: `http://localhost:5000/api/database-status`
+Then visit: `http://localhost:5001/api/database-status`
 
 This endpoint will show you:
 - Configuration status

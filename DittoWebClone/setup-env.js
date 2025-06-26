@@ -47,7 +47,7 @@ try {
   console.log('   1. Check if the Supabase project is still active');
   console.log('   2. Create a new Supabase project if needed');
   console.log('   3. Update the SUPABASE_URL and SUPABASE_KEY in the .env file');
-  console.log('\n🔍 To test the connection, visit: http://localhost:5000/api/database-status');
+  console.log('\n🔍 To test the connection, visit: http://localhost:5001/api/database-status');
   console.log('\n🚀 You can now start the server with: npm run dev');
 } catch (error) {
   console.error('❌ Failed to create .env file:', error.message);
@@ -59,4 +59,4 @@ console.log('\n📚 Next steps:');
 console.log('1. Verify your Supabase project is active');
 console.log('2. Update credentials if needed');
 console.log('3. Start the server: npm run dev');
-console.log('4. Test connection: http://localhost:5000/api/database-status'); 
+console.log('4. Test connection: http://localhost:5001/api/database-status'); 

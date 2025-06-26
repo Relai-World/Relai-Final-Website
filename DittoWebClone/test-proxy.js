@@ -5,7 +5,7 @@ async function testProxyImage() {
   try {
     // Test with a simple image URL first
     const testUrl = 'https://via.placeholder.com/300x200/FF0000/FFFFFF?text=Test+Image';
-    const proxyUrl = `http://localhost:5000/api/proxy-image?url=${encodeURIComponent(testUrl)}`;
+    const proxyUrl = `http://localhost:5001/api/proxy-image?url=${encodeURIComponent(testUrl)}`;
     
     console.log('Testing proxy image endpoint...');
     console.log('Original URL:', testUrl);
@@ -21,7 +21,7 @@ async function testProxyImage() {
       
       // Test with one of the actual Google Maps URLs from your response
       const googleMapsUrl = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=AXQCQNSmYUHt0Ijx7XbGlbocatsIbOhGCl_i2-q1WlWiaC0N8InAvKOaNmD-h-QWP5aH6rfKHRngvUrFsJ58RORjnNmPoC6Yj4MWJUA6-WbEKjW5pAgHJpPEw9wlT_tpvLsNMPzjj7kXPHmm2g76aAshj886UtAu62nYQQJwnjF-dEjblaTw-lwNT1JZCFp3_Rv3mx4RFikp6GYJEaiW3Vcl4_1eE9a8L9KaO4E2bel4-pXz7ZprZJM_kEy5Ggr4-uuNAtseH4Ux1foj58aJIPjGv1zSpM9EWJ_Df9NoBPn3F8AmRThKtpHYaRBGyIROV_Lqji7ub3p-1xc&key=AIzaSyDNrcrk7lQYchpASVX0RxY091ltniMpZZU';
-      const googleProxyUrl = `http://localhost:5000/api/proxy-image?url=${encodeURIComponent(googleMapsUrl)}`;
+      const googleProxyUrl = `http://localhost:5001/api/proxy-image?url=${encodeURIComponent(googleMapsUrl)}`;
       
       console.log('\nTesting with Google Maps URL...');
       console.log('Google Maps URL:', googleMapsUrl);
