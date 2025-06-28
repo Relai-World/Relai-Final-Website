@@ -50,7 +50,8 @@ const extractPropertyData = (property: any): any => {
 
 // Define the backend URL for constructing image paths
 // In a real app, this should come from an environment variable (e.g., import.meta.env.VITE_API_URL)
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL_PROPERTIES = import.meta.env.VITE_API_URL_PROPERTIES || 'http://localhost:3000';
+const API_BASE_URL_OTHERS = import.meta.env.VITE_API_URL_OTHERS || 'http://localhost:5001';
 
 // Helper function to format date from DD-MM-YYYY to MM-YY (e.g., "01-08-2028" -> "08-28")
 const formatPossessionDate = (dateStr?: string): string => {
@@ -213,7 +214,7 @@ export default function AllPropertiesPage() {
       if (constructionStatus !== 'any') params.append('constructionStatus', constructionStatus);
       // Add other filters as needed
       
-      const endpoint = `${API_BASE_URL}/api/all-properties`;
+      const endpoint = `${API_BASE_URL_PROPERTIES}/api/all-properties`;
       const url = `${endpoint}?${params.toString()}`;
       return apiRequest<{ properties: ApiProperty[] }>(url);
     },
@@ -354,7 +355,7 @@ export default function AllPropertiesPage() {
                   <div className="relative w-full h-56 bg-gray-200">
                     {propertyData.images && propertyData.images.length > 0 ? (
                       <img 
-                        src={`${API_BASE_URL}${propertyData.images[0]}`}
+                        src={`${API_BASE_URL_OTHERS}${propertyData.images[0]}`}
                         alt={propertyData.ProjectName || propertyData.projectName || 'Property Image'}
                         className="w-full h-full object-cover"
                         loading="lazy"
@@ -399,15 +400,18 @@ export default function AllPropertiesPage() {
                             {(() => {
                               // 1. Try direct configurations array (robust check)
                               let configs = propertyData.configurations;
-                              // Ignore if it's an error object (e.g., {name: "ValidatorError", ...})
                               if (
                                 Array.isArray(configs) &&
                                 configs.length > 0
                               ) {
-                                const types = configs
-                                  .map((conf: any) => conf && (conf.type || conf.Type || ''))
-                                  .filter(Boolean);
-                                return types.length > 0 ? types.join(', ') : 'N/A';
+                                // Collect unique types
+                                const configTypesSet = new Set(
+                                  configs
+                                    .map((conf: any) => conf && (conf.type || conf.Type || ''))
+                                    .filter(Boolean)
+                                );
+                                const configTypes = Array.from(configTypesSet);
+                                return configTypes.length > 0 ? configTypes.join(', ') : 'N/A';
                               } else if (
                                 configs &&
                                 typeof configs === 'object' &&
@@ -421,10 +425,13 @@ export default function AllPropertiesPage() {
                                 propertyData?.$errors?.configurations?.properties?.value ||
                                 propertyData?.$__?.validationError?.errors?.configurations?.properties?.value;
                               if (Array.isArray(configs) && configs.length > 0) {
-                                const types = configs
-                                  .map((conf: any) => conf && (conf.type || conf.Type || ''))
-                                  .filter(Boolean);
-                                return types.length > 0 ? types.join(', ') : 'N/A';
+                                const configTypesSet = new Set(
+                                  configs
+                                    .map((conf: any) => conf && (conf.type || conf.Type || ''))
+                                    .filter(Boolean)
+                                );
+                                const configTypes = Array.from(configTypesSet);
+                                return configTypes.length > 0 ? configTypes.join(', ') : 'N/A';
                               }
                               // 3. Fallback: previous logic
                               let configDetails = propertyData.configurationDetails;
@@ -436,12 +443,15 @@ export default function AllPropertiesPage() {
                                 }
                               }
                               if (Array.isArray(configDetails) && configDetails.length > 0) {
-                                const types = configDetails
-                                  .map((conf: any) =>
-                                    conf && (conf.type || conf.Type || conf.bhkType || conf.bhk || conf.unitType || conf.configurationType || '')
-                                  )
-                                  .filter(Boolean);
-                                return types.length > 0 ? types.join(', ') : 'N/A';
+                                const configTypesSet = new Set(
+                                  configDetails
+                                    .map((conf: any) =>
+                                      conf && (conf.type || conf.Type || conf.bhkType || conf.bhk || conf.unitType || conf.configurationType || '')
+                                    )
+                                    .filter(Boolean)
+                                );
+                                const configTypes = Array.from(configTypesSet);
+                                return configTypes.length > 0 ? configTypes.join(', ') : 'N/A';
                               }
                               const possibleConfigFields = [
                                 propertyData.Configurations,
