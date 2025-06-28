@@ -1,8 +1,7 @@
 {
   "include": [
-    "DittoWebClone/backend/client/src/**/*",
-    "DittoWebClone/backend/shared/**/*",
-    "DittoWebClone/backend/server/**/*"
+    "client/src/**/*", 
+    "../backend/shared/**/*"
   ],
   "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
   "compilerOptions": {
@@ -20,8 +19,8 @@
     "baseUrl": ".",
     "types": ["node", "vite/client"],
     "paths": {
-      "@/*": ["DittoWebClone/backend/client/src/*"],
-      "@shared/*": ["DittoWebClone/backend/shared/*"]
+      "@/*": ["./client/src/*"],
+      "@shared/*": ["../backend/shared/*"] 
     }
   }
 }

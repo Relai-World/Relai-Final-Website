@@ -4,7 +4,7 @@ import { getMapImages } from './google-maps-images';
 
 // Utility function to get base URL, can be configured via ENV for non-HTTP contexts
 function getBaseUrl(): string {
-  return process.env.BASE_URL || 'http://localhost:3000';
+  return process.env.BASE_URL || 'http://localhost:5001';
 }
 
 /**
