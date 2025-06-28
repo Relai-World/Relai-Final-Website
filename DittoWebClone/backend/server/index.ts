@@ -1,0 +1,147 @@
+import { fileURLToPath } from 'url';
+import path from 'path';
+import cors from 'cors';
+
+// Fix for __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+import express, { type Request, Response, NextFunction } from "express";
+import { registerRoutes } from "./routes";
+import { setupVite, serveStatic, log } from "./vite";
+import dotenv from 'dotenv';
+import { initializeDatabase, closeDatabase } from "./db";
+import { 
+  createRateLimit, 
+  validateUserAgent, 
+  analyzeRequestPattern, 
+  addRandomDelay, 
+  validateRequest, 
+  honeypot 
+} from "./antiScraping";
+
+// Explicitly load .env from project root
+const envPath = path.resolve(__dirname, '../../.env');
+dotenv.config({ path: envPath });
+
+// Log the API key status (masked for security)
+if (process.env.GOOGLE_API_KEY) {
+  console.log('Google Maps API Key loaded successfully');
+  // Debug print (first 6 chars only for safety)
+  console.log('GOOGLE_API_KEY:', process.env.GOOGLE_API_KEY.slice(0, 6) + '...');
+} else {
+  console.warn('Google Maps API Key not found in environment variables');
+}
+
+const app = express();
+
+// CORS middleware to allow cross-origin requests from frontend
+app.use(cors({
+  origin: 'http://localhost:5173', // or 3000, or wherever your frontend runs
+  credentials: true, // if you use cookies/auth
+}));
+
+// Redirect www.relai.world to relai.world
+app.use((req, res, next) => {
+  const host = req.get('host');
+  if (host && host.startsWith('www.')) {
+    const newHost = host.slice(4); // Remove 'www.'
+    const protocol = req.get('x-forwarded-proto') || req.protocol || 'https';
+    const redirectUrl = `${protocol}://${newHost}${req.originalUrl}`;
+    return res.redirect(301, redirectUrl);
+  }
+  next();
+});
+
+// Anti-scraping middleware (apply before other middleware) - gentle protection
+app.use(validateUserAgent); // Only blocks obvious scraping tools
+app.use(createRateLimit(15 * 60 * 1000, 1000)); // 1000 requests per 15 minutes (very permissive)
+
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: false, limit: '50mb' }));
+
+app.use((req, res, next) => {
+  const start = Date.now();
+  const path = req.path;
+  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+
+  const originalResJson = res.json;
+  res.json = function (bodyJson, ...args) {
+    capturedJsonResponse = bodyJson;
+    return originalResJson.apply(res, [bodyJson, ...args]);
+  };
+
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (path.startsWith("/api")) {
+      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
+      if (capturedJsonResponse) {
+        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      }
+
+      if (logLine.length > 80) {
+        logLine = logLine.slice(0, 79) + "…";
+      }
+
+      log(logLine);
+    }
+  });
+
+  next();
+});
+
+(async () => {
+  try {
+    // Initialize MongoDB connection
+    console.log('🔄 Initializing MongoDB connection...');
+    await initializeDatabase();
+    console.log('✅ MongoDB connected successfully!');
+
+    const server = await registerRoutes(app);
+
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
+
+      res.status(status).json({ message });
+      throw err;
+    });
+
+    // importantly only setup vite in development and after
+    // setting up all the other routes so the catch-all route
+    // doesn't interfere with the other routes
+    if (app.get("env") === "development") {
+      await setupVite(app, server);
+    } else {
+      serveStatic(app);
+    }
+
+    // ALWAYS serve the app on port 5001
+    // this serves both the API and the client.
+    // It is the only port that is not firewalled.
+    const port = 5001;
+    server.listen(5001, () => {
+      console.log("🚀 Server is running on port 5001");
+      console.log("📊 Database: MongoDB (Relai)");
+      console.log("🌐 Environment:", app.get("env"));
+    });
+
+    // Graceful shutdown
+    process.on('SIGINT', async () => {
+      console.log('\n🔄 Shutting down server gracefully...');
+      await closeDatabase();
+      process.exit(0);
+    });
+
+    process.on('SIGTERM', async () => {
+      console.log('\n🔄 Shutting down server gracefully...');
+      await closeDatabase();
+      process.exit(0);
+    });
+
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+})();
+
