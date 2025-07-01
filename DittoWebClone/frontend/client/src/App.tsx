@@ -94,7 +94,8 @@ function Router() {
       <Route path="/tools/rate-analyzer" component={PropertyRateAnalyzerPage} />
       
       {/* Property Comparison Page */}
-      <Route path="/compare" component={PropertyComparisonPage} />
+      {/* changes by me */}
+      <Route path="/comparison" component={PropertyComparisonPage} />
       <Route path="/compare-properties" component={PropertyComparisonPage} />
       
       {/* AI Assistant Page */}

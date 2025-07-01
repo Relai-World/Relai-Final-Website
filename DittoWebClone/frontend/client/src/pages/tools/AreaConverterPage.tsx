@@ -650,7 +650,7 @@ export default function AreaConverterPage() {
               Our property experts can help you understand exact property dimensions and area calculations during property viewing. Schedule a site visit with our experts today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bg-white text-[#1752FF] hover:bg-gray-100 flex items-center" onClick={() => navigate("/contact")}>
+              <Button className="bg-white text-[#1752FF] hover:bg-gray-100 flex items-center" onClick={() => navigate("/contact-us")}>
                 <HelpCircle className="mr-2 h-4 w-4" />
                 Speak to a Property Expert
               </Button>
