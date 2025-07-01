@@ -43,6 +43,7 @@ import DatabaseInspectionPage from "@/pages/DatabaseInspectionPage";
 
 // Property Comparison Page
 import PropertyComparisonPage from "@/pages/PropertyComparisonTable";
+import PropertyComparisonSimple from "@/pages/PropertyComparisonSimple";
 
 // Blog Pages
 import BlogPage from "@/pages/BlogPage";
@@ -96,6 +97,7 @@ function Router() {
       {/* Property Comparison Page */}
       <Route path="/compare" component={PropertyComparisonPage} />
       <Route path="/compare-properties" component={PropertyComparisonPage} />
+      <Route path="/compare-simple" component={PropertyComparisonSimple} />
       
       {/* AI Assistant Page */}
       <Route path="/ai-assistant" component={AIChatbotPage} />

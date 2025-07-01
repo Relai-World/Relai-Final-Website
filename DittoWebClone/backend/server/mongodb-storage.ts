@@ -45,6 +45,8 @@ export interface IStorage {
     maxPricePerSqft?: number;
     configurations?: string;
     constructionStatus?: string;
+    communityType?: string;
+    possessionTimeline?: string;
   }): Promise<IProperty[]>;
   getPropertyById(id: string): Promise<IProperty | null>;
   createProperty(property: any): Promise<IProperty>;
@@ -139,6 +141,8 @@ export class MongoDBStorage implements IStorage {
     maxPricePerSqft?: number;
     configurations?: string;
     constructionStatus?: string;
+    communityType?: string;
+    possessionTimeline?: string;
   }): Promise<IProperty[]> {
     try {
       let query: any = {};
@@ -153,8 +157,16 @@ export class MongoDBStorage implements IStorage {
         ];
       }
 
-      if (filters?.location) {
-        query.location = { $regex: filters.location, $options: 'i' };
+      // Robust location filtering: match both 'Area' and 'location' fields (case-insensitive)
+      if (filters?.location && String(filters.location) !== 'any') {
+        // If there is already an $or in the query, merge with AND logic for configurations
+        query.$and = query.$and || [];
+        query.$and.push({
+          $or: [
+            { Area: { $regex: filters.location, $options: 'i' } },
+            { location: { $regex: filters.location, $options: 'i' } }
+          ]
+        });
       }
 
       if (filters?.propertyType) {
@@ -162,9 +174,17 @@ export class MongoDBStorage implements IStorage {
       }
 
       if (filters?.minPrice || filters?.maxPrice) {
-        query.price = {};
-        if (filters.minPrice) query.price.$gte = filters.minPrice;
-        if (filters.maxPrice) query.price.$lte = filters.maxPrice;
+        // Filter based on configurations array BaseProjectPrice
+        if (filters.minPrice && filters.maxPrice) {
+          query['configurations.BaseProjectPrice'] = {
+            $gte: filters.minPrice,
+            $lte: filters.maxPrice
+          };
+        } else if (filters.minPrice) {
+          query['configurations.BaseProjectPrice'] = { $gte: filters.minPrice };
+        } else if (filters.maxPrice) {
+          query['configurations.BaseProjectPrice'] = { $lte: filters.maxPrice };
+        }
       }
 
       if (filters?.bedrooms) {
@@ -178,12 +198,28 @@ export class MongoDBStorage implements IStorage {
       }
 
       if (filters?.configurations) {
-        query.configurations = { $regex: filters.configurations, $options: 'i' };
+        query.$and = query.$and || [];
+        query.$and.push({
+          'configurations.type': { $regex: filters.configurations, $options: 'i' }
+        });
       }
 
       if (filters?.constructionStatus) {
         query.constructionStatus = { $regex: filters.constructionStatus, $options: 'i' };
       }
+
+      // Community type filtering
+      if (filters?.communityType) {
+        query.communityType = { $regex: filters.communityType, $options: 'i' };
+      }
+
+      // Possession timeline filtering
+      if (filters?.possessionTimeline) {
+        query.Possession_date = { $regex: filters.possessionTimeline, $options: 'i' };
+      }
+
+      // Debug log for the final MongoDB query
+      console.log('MongoDB getAllProperties query:', JSON.stringify(query, null, 2));
 
       return await Property.find(query).sort({ createdAt: -1 });
     } catch (error) {

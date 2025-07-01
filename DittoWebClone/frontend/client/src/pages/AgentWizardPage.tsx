@@ -717,7 +717,7 @@ export default function AgentWizardPage() {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       <div>
-                        <Label className="text-xs font-medium text-gray-700 mb-2 block">Community Type (Multiple)</Label>
+                        {/* <Label className="text-xs font-medium text-gray-700 mb-2 block">Community Type (Multiple)</Label> */}
                         <div className="relative">
                           <div 
                             className="border border-gray-300 rounded-md p-2 min-h-[44px] bg-white cursor-pointer flex items-center justify-between"

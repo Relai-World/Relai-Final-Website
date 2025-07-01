@@ -1,9 +1,10 @@
 import express from 'express';
 import { mongodbStorage } from '../mongodb-storage';
+import { Property } from '../../shared/mongodb-schemas'; // adjust path as needed
 
 const router = express.Router();
 
-// Property wizard endpoint - uses exact same filtering logic as All Properties page
+// Property wizard endpoint - enhanced filtering for wizard preferences
 router.get('/', async (req, res) => {
   try {
     console.log('Property Wizard API called');
@@ -12,97 +13,194 @@ router.get('/', async (req, res) => {
     const {
       minPrice,
       maxPrice,
-      budget,
       location,
-      propertyType,
       configurations,
-      constructionStatus,
-      communityType,
-      possessionTimeline
+      possessionTimeline,
+      baseProjectPrice
     } = req.query;
 
-    // Build filters object using exact same structure as All Properties page
-    const filters: any = {};
+    // Build MongoDB query filters
+    const query: any = {};
 
-    // 1. Budget filtering - handle both direct minPrice/maxPrice and budget string conversion
-    if (minPrice) {
-      filters.minPrice = parseInt(String(minPrice), 10);
+    // Direct BaseProjectPrice filtering
+    if (baseProjectPrice) {
+      query['configurations.BaseProjectPrice'] = parseInt(baseProjectPrice as string, 10);
     }
-    if (maxPrice) {
-      filters.maxPrice = parseInt(String(maxPrice), 10);
-    }
-    
-    // Convert budget string to minPrice/maxPrice if budget is provided
-    if (budget && String(budget) !== 'any') {
-      const budgetStr = String(budget).toLowerCase();
-      console.log('Converting budget string:', budgetStr);
+
+    // 1. Budget Range Filtering - Filter by configurations.BaseProjectPrice
+    if (minPrice || maxPrice) {
+      query['configurations.BaseProjectPrice'] = {};
       
-      if (budgetStr === 'under-50l') {
-        filters.maxPrice = 5000000; // 50L
-        console.log('Budget: Under 50L - maxPrice set to 5000000');
-      } else if (budgetStr === 'above-2cr') {
-        filters.minPrice = 20000000; // 2Cr
-        console.log('Budget: Above 2Cr - minPrice set to 20000000');
-      } else if (budgetStr === '50l-75l') {
-        filters.minPrice = 5000000; // 50L
-        filters.maxPrice = 7500000; // 75L
-        console.log('Budget: 50L-75L - range 5000000 to 7500000');
-      } else if (budgetStr === '75l-1cr') {
-        filters.minPrice = 7500000; // 75L
-        filters.maxPrice = 10000000; // 1Cr
-        console.log('Budget: 75L-1Cr - range 7500000 to 10000000');
-      } else if (budgetStr === '1cr-1.5cr') {
-        filters.minPrice = 10000000; // 1Cr
-        filters.maxPrice = 15000000; // 1.5Cr
-        console.log('Budget: 1Cr-1.5Cr - range 10000000 to 15000000');
-      } else if (budgetStr === '1.5cr-2cr') {
-        filters.minPrice = 15000000; // 1.5Cr
-        filters.maxPrice = 20000000; // 2Cr
-        console.log('Budget: 1.5Cr-2Cr - range 15000000 to 20000000');
+      if (minPrice) {
+        query['configurations.BaseProjectPrice'].$gte = parseInt(String(minPrice), 10);
+      }
+      
+      if (maxPrice) {
+        query['configurations.BaseProjectPrice'].$lte = parseInt(String(maxPrice), 10);
       }
     }
 
-    // 2. Location filtering - handle multiple locations like All Properties page
+    // 2. Location Filtering - Filter by Area field (case-insensitive)
     if (location && String(location) !== 'any') {
-      filters.location = String(location);
+      // Handle multiple locations separated by commas
+      const locations = String(location).split(',').map(loc => loc.trim());
+      
+      if (locations.length === 1) {
+        // Single location - exact match with case-insensitive
+        query.Area = { $regex: locations[0], $options: 'i' };
+      } else {
+        // Multiple locations - match any of them
+        query.Area = { $in: locations.map(loc => new RegExp(loc, 'i')) };
+      }
     }
 
-    // 3. Property type filtering - exact same logic
-    if (propertyType && String(propertyType) !== 'any') {
-      filters.propertyType = String(propertyType);
-    }
-
-    // 4. Configuration filtering - exact same logic
+    // 3. Configuration Filtering - Filter by configurations.type
     if (configurations && String(configurations) !== 'any') {
-      filters.configurations = String(configurations);
+      // Handle multiple configurations separated by commas
+      const configs = String(configurations).split(',').map(config => config.trim());
+      
+      if (configs.length === 1) {
+        // Single configuration - exact match with case-insensitive
+        query['configurations.type'] = { $regex: configs[0], $options: 'i' };
+      } else {
+        // Multiple configurations - match any of them
+        query['configurations.type'] = { $in: configs.map(config => new RegExp(config, 'i')) };
+      }
     }
 
-    // 5. Construction status filtering - exact same logic
-    if (constructionStatus && String(constructionStatus) !== 'any') {
-      filters.constructionStatus = String(constructionStatus);
+    // Direct configurations.type filtering
+    if (configurations && String(configurations) !== 'any') {
+      query['configurations.type'] = { $regex: `^${configurations}$`, $options: 'i' };
     }
 
-    // 6. Community type filtering - using Type of Community column
-    if (communityType && String(communityType) !== 'any') {
-      filters.communityType = String(communityType);
-    }
-
-    // 7. Possession timeline filtering - using PossessionDate column
+    // 4. Possession Timeline Filtering - Filter by Possession_date
     if (possessionTimeline && String(possessionTimeline) !== 'any') {
-      filters.possessionTimeline = String(possessionTimeline);
+      const timeline = String(possessionTimeline).toLowerCase();
+      
+      // Since Possession_date is stored as string in DD-MM-YYYY format, we'll use regex matching
+      // for more flexible filtering based on the timeline requirements
+      switch (timeline) {
+        case 'ready-to-move':
+          // Properties ready to move - possession date should be in the past or very near future
+          // Match dates that are in the past or current year
+          const currentYear = new Date().getFullYear();
+          query.Possession_date = { 
+            $regex: `^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-(${currentYear}|${currentYear - 1})$`
+          };
+          break;
+          
+        case '0-1-year':
+          // Properties available within 1 year - match current year and next year
+          const nextYear = new Date().getFullYear() + 1;
+          query.Possession_date = { 
+            $regex: `^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-(${new Date().getFullYear()}|${nextYear})$`
+          };
+          break;
+          
+        case '1-2-years':
+          // Properties available in 1-2 years
+          const year1 = new Date().getFullYear() + 1;
+          const year2 = new Date().getFullYear() + 2;
+          query.Possession_date = { 
+            $regex: `^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-(${year1}|${year2})$`
+          };
+          break;
+          
+        case '2-3-years':
+          // Properties available in 2-3 years
+          const year2_start = new Date().getFullYear() + 2;
+          const year3 = new Date().getFullYear() + 3;
+          query.Possession_date = { 
+            $regex: `^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-(${year2_start}|${year3})$`
+          };
+          break;
+          
+        case '3-4-years':
+          // Properties available in 3-4 years
+          const year3_start = new Date().getFullYear() + 3;
+          const year4 = new Date().getFullYear() + 4;
+          query.Possession_date = { 
+            $regex: `^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-(${year3_start}|${year4})$`
+          };
+          break;
+          
+        case '5-years':
+          // Properties available in 5+ years
+          const year5 = new Date().getFullYear() + 5;
+          query.Possession_date = { 
+            $regex: `^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-(${year5}|[0-9]{4})$`
+          };
+          break;
+          
+        default:
+          // For any other timeline, try to match the text in Possession_date
+          query.Possession_date = { $regex: timeline, $options: 'i' };
+      }
     }
 
-    console.log('Wizard filters constructed:', filters);
+    // Direct Possession_date filtering
+    if (req.query.Possession_date) {
+      query.Possession_date = req.query.Possession_date;
+    }
 
-    // Use the same getAllProperties method with exact same filtering logic
-    const properties = await mongodbStorage.getAllProperties(filters);
+    console.log('Wizard MongoDB query:', JSON.stringify(query, null, 2));
+
+    // Execute the query using the Property model directly for better control
+    const properties = await Property.find(query).sort({ createdAt: -1 });
 
     console.log(`Wizard retrieved ${properties.length} properties from database`);
 
+    // Transform the results to match the expected format
+    const transformedProperties = properties.map(property => {
+      const propertyObj = property.toObject();
+      
+      // Ensure we have the required fields for the frontend
+      return {
+        _id: propertyObj._id,
+        RERA_Number: propertyObj.RERA_Number || propertyObj.reraNumber,
+        ProjectName: propertyObj.ProjectName || propertyObj.projectName,
+        BuilderName: propertyObj.BuilderName || propertyObj.developerName,
+        Area: propertyObj.Area || propertyObj.location,
+        Possession_date: propertyObj.Possession_date || propertyObj.possessionDate,
+        Price_per_sft: propertyObj.Price_per_sft || propertyObj.pricePerSqft,
+        configurations: propertyObj.configurations || [],
+        propertyType: propertyObj.propertyType,
+        constructionStatus: propertyObj.constructionStatus,
+        images: propertyObj.images || [],
+        amenities: propertyObj.amenities || [],
+        description: propertyObj.description || propertyObj.remarksComments,
+        rating: propertyObj.rating || propertyObj.relaiRating,
+        // Include other important fields
+        developerName: propertyObj.developerName,
+        reraNumber: propertyObj.reraNumber,
+        projectName: propertyObj.projectName,
+        location: propertyObj.location,
+        possessionDate: propertyObj.possessionDate,
+        pricePerSqft: propertyObj.pricePerSqft,
+        price: propertyObj.price,
+        longitude: propertyObj.longitude,
+        latitude: propertyObj.latitude,
+        bedrooms: propertyObj.bedrooms,
+        bathrooms: propertyObj.bathrooms,
+        area: propertyObj.area,
+        features: propertyObj.features,
+        builder: propertyObj.builder,
+        possession: propertyObj.possession,
+        createdAt: propertyObj.createdAt,
+        updatedAt: propertyObj.updatedAt
+      };
+    });
+
     res.json({
-      properties,
-      total: properties.length,
-      filters: filters
+      properties: transformedProperties,
+      total: transformedProperties.length,
+      filters: {
+        minPrice: minPrice ? parseInt(String(minPrice), 10) : undefined,
+        maxPrice: maxPrice ? parseInt(String(maxPrice), 10) : undefined,
+        location: location || undefined,
+        configurations: configurations || undefined,
+        possessionTimeline: possessionTimeline || undefined
+      }
     });
 
   } catch (error) {
@@ -111,6 +209,15 @@ router.get('/', async (req, res) => {
       error: 'Failed to fetch properties',
       details: error instanceof Error ? error.message : 'Unknown error'
     });
+  }
+});
+
+router.get('/unique-possession-dates', async (req, res) => {
+  try {
+    const dates = await Property.distinct('Possession_date');
+    res.json({ dates });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch possession dates' });
   }
 });
 

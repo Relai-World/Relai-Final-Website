@@ -190,7 +190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         filters.propertyType = propertyType;
       }
       if (location && location !== 'any') {
-        filters.location = location;
+        filters.Area = { $regex: location, $options: 'i' };
       }
       if (communityType && communityType !== 'any') {
         filters.communityType = communityType;

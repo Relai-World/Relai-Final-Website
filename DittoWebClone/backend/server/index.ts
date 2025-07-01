@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'url';
 import path from 'path';
 import cors from 'cors';
+import type { CorsOptionsDelegate, CorsRequest } from 'cors';
 
 // Fix for __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -35,10 +36,16 @@ if (process.env.GOOGLE_API_KEY) {
 
 const app = express();
 
-// CORS middleware to allow cross-origin requests from frontend
+// CORS middleware to allow cross-origin requests from any localhost port for development
 app.use(cors({
-  origin: 'http://localhost:5173', // or 3000, or wherever your frontend runs
-  credentials: true, // if you use cookies/auth
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    if (!origin || origin.startsWith('http://localhost:')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
 }));
 
 // Redirect www.relai.world to relai.world

@@ -57,15 +57,15 @@ const getPossessionText = (value?: string) => {
   if (!value) return "Not specified";
   if (value === "not-decided") return "Not decided yet";
   
-  const map: {[key: string]: string} = {
-    "ready-to-move": "Ready to Move In",
-    "3-6-months": "3-6 Months",
-    "6-12-months": "6-12 Months",
-    "1-2-years": "1-2 Years",
-    "more-than-2-years": "More than 2 Years"
-  };
-  return map[value] || value;
-};
+//   const map: {[key: string]: string} = {
+//     "ready-to-move": "Ready to Move In",
+//     "3-6-months": "3-6 Months",
+//     "6-12-months": "6-12 Months",
+//     "1-2-years": "1-2 Years",
+//     "more-than-2-years": "More than 2 Years"
+//   };
+//   return map[value] || value;
+// };
 
 const getConfigurationText = (value?: string) => {
   if (!value) return "Not specified";

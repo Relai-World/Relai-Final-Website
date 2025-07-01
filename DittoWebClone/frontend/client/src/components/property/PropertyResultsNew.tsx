@@ -36,19 +36,63 @@ interface Property {
   propertyType: string;
   communityType?: string;
   developerName: string;
-  configurations?: string;
+  configurations?: string | Array<{
+    type: string;
+    sizeRange: number;
+    sizeUnit: string;
+    facing: string;
+    BaseProjectPrice: number;
+  }>;
   possessionDate: string;
   minimumBudget?: number;
   maximumBudget?: number;
   area?: number;
   pricePerSqft?: number;
   images?: string[];
+  // Additional fields that might be present in the data
+  Area?: string;
+  BuilderName?: string;
+  Possession_date?: string;
 }
 
 interface PropertyResultsNewProps {
   properties: Property[];
   preferences: any;
 }
+
+// Function to get property images from property_images folder
+const getPropertyImages = (property: Property): string[] => {
+  // If property already has images, return them
+  if (property.images && property.images.length > 0) {
+    return property.images;
+  }
+
+  // Generate image path based on property name and location
+  const propertyName = property.projectName || '';
+  const location = property.location || property.Area || '';
+  
+  if (!propertyName || !location) {
+    return [];
+  }
+
+  // Create a key similar to the cache format
+  const key = `${propertyName.toLowerCase().replace(/\s+/g, '_')}|${location.toLowerCase().replace(/\s+/g, '_')}`;
+  
+  // Try to find images in the property_images folder
+  // This is a simplified approach - in a real implementation, you might want to:
+  // 1. Check if the image files exist
+  // 2. Use a proper image mapping service
+  // 3. Fall back to default images if none found
+  
+  const possibleImages = [
+    `/property_images/${propertyName.toLowerCase().replace(/\s+/g, '_20')}_${location.toLowerCase().replace(/\s+/g, '_20')}_0.jpg`,
+    `/property_images/${propertyName.toLowerCase().replace(/\s+/g, '_20')}_${location.toLowerCase().replace(/\s+/g, '_20')}_1.jpg`,
+    `/property_images/${propertyName.toLowerCase().replace(/\s+/g, '_20')}_${location.toLowerCase().replace(/\s+/g, '_20')}_2.jpg`,
+  ];
+
+  // Filter out images that don't exist (you might want to implement proper file checking)
+  return possibleImages;
+};
 
 export default function PropertyResultsNew({ properties, preferences }: PropertyResultsNewProps) {
   const [showAllProperties, setShowAllProperties] = useState(false);
@@ -388,111 +432,123 @@ export default function PropertyResultsNew({ properties, preferences }: Property
                 initial="hidden"
                 animate="visible"
               >
-                {displayProperties.map((property, index) => (
-                  <motion.div
-                    key={property.id}
-                    variants={cardVariants}
-                    className={!showAllProperties && index >= 6 ? "blur-sm opacity-60 pointer-events-none" : ""}
-                  >
-                    <Card className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-sm hover:bg-white h-[520px] flex flex-col">
-                      <div className="relative">
-                        {/* Budget Badge */}
-                        <div className="absolute top-4 left-4 z-10">
-                          <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-3 py-1">
-                            {formatBudgetRange(property)}
-                          </Badge>
-                        </div>
-                        
-                        {/* Smart Rating */}
-                        <div className="absolute top-4 right-4 z-10">
-                          <div className="bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
-                            <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                            <span className="text-xs font-semibold text-gray-700">
-                              {calculateSmartRating(property).toFixed(1)}
-                            </span>
+                {displayProperties.map((property, index) => {
+                  // Get property images from property_images folder
+                  const propertyImages = getPropertyImages(property);
+                  
+                  return (
+                    <motion.div
+                      key={property.id}
+                      variants={cardVariants}
+                      className={!showAllProperties && index >= 6 ? "blur-sm opacity-60 pointer-events-none" : ""}
+                    >
+                      <Card className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-sm hover:bg-white h-[520px] flex flex-col">
+                        <div className="relative">
+                          {/* Budget Badge */}
+                          <div className="absolute top-4 left-4 z-10">
+                            <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-3 py-1">
+                              {formatBudgetRange(property)}
+                            </Badge>
                           </div>
-                        </div>
+                          
+                          {/* Smart Rating */}
+                          <div className="absolute top-4 right-4 z-10">
+                            <div className="bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
+                              <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                              <span className="text-xs font-semibold text-gray-700">
+                                {calculateSmartRating(property).toFixed(1)}
+                              </span>
+                            </div>
+                          </div>
 
-                        {/* Property Image */}
-                        <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center group-hover:scale-105 transition-transform duration-500 overflow-hidden">
-                          {property.images && property.images.length > 0 ? (
-                            <img 
-                              src={property.images[0]} 
-                              alt={property.projectName} 
-                              className="w-full h-full object-cover" 
+                          {/* Property Image */}
+                          <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center group-hover:scale-105 transition-transform duration-500 overflow-hidden">
+                            <img
+                              src={
+                                property.images && property.images.length > 0
+                                  ? property.images[0]
+                                  : "http://localhost:5001/property_images/floresta_20patighanpur_0.jpg"
+                              }
+                              alt={property.projectName}
+                              className="w-full h-full object-cover"
                             />
-                          ) : (
-                            <Building className="h-16 w-16 text-gray-400" />
-                          )}
-                        </div>
-                      </div>
-
-                      <CardContent className="p-6 flex-1 flex flex-col">
-                        <div className="flex-1 space-y-4">
-                          {/* Property Title */}
-                          <div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
-                              {property.projectName}
-                            </h3>
-                            <div className="flex items-center gap-2 text-gray-600">
-                              <MapPin className="h-4 w-4" />
-                              <span className="text-sm">{property.location}</span>
-                            </div>
                           </div>
+                        </div>
 
-                          {/* Property Details */}
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Home className="h-4 w-4 text-blue-500" />
-                                <span className="text-sm text-gray-600 capitalize">{property.propertyType}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Users className="h-4 w-4 text-green-500" />
-                                <span className="text-sm text-gray-600">By {property.developerName}</span>
+                        <CardContent className="p-6 flex-1 flex flex-col">
+                          <div className="flex-1 space-y-4">
+                            {/* Property Title */}
+                            <div>
+                              <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+                                {property.projectName}
+                              </h3>
+                              <div className="flex items-center gap-2 text-gray-600">
+                                <MapPin className="h-4 w-4" />
+                                <span className="text-sm">{property.location || property.Area}</span>
                               </div>
                             </div>
-                            <div className="space-y-2">
-                              {property.configurations && (
+
+                            {/* Property Details */}
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                {/* <div className="flex items-center gap-2">
+                                  <Home className="h-4 w-4 text-blue-500" />
+                                  <span className="text-sm text-gray-600 capitalize">{property.propertyType}</span>
+                                </div> */}
                                 <div className="flex items-center gap-2">
-                                  <Building className="h-4 w-4 text-purple-500" />
-                                  <span className="text-sm text-gray-600">{property.configurations}</span>
+                                  <Users className="h-4 w-4 text-green-500" />
+                                  <span className="text-sm text-gray-600">By {property.developerName || property.BuilderName}</span>
                                 </div>
-                              )}
-                              <div className="flex items-center gap-2">
-                                <Calendar className="h-4 w-4 text-orange-500" />
-                                <span className="text-sm text-gray-600">{formatPossessionDate(property.possessionDate)}</span>
+                              </div>
+                              <div className="space-y-2">
+                                {property.configurations && (
+                                  <div className="flex items-center gap-2">
+                                    <Building className="h-4 w-4 text-purple-500" />
+                                    <span className="text-sm text-gray-600">
+                                      {Array.isArray(property.configurations) 
+                                        ? property.configurations.map((config: any) => config.type).filter(Boolean).join(', ')
+                                        : typeof property.configurations === 'string'
+                                          ? property.configurations
+                                          : 'N/A'
+                                      }
+                                    </span>
+                                  </div>
+                                )}
+                                <div className="flex items-center gap-2">
+                                  <Calendar className="h-4 w-4 text-orange-500" />
+                                  <span className="text-sm text-gray-600">{formatPossessionDate(property.possessionDate || property.Possession_date || '')}</span>
+                                </div>
                               </div>
                             </div>
+
+                            {/* Community Type */}
+                            {property.communityType && (
+                              <div className="pt-2">
+                                <Badge variant="outline" className="text-xs">
+                                  {property.communityType}
+                                </Badge>
+                              </div>
+                            )}
                           </div>
 
-                          {/* Community Type */}
-                          {property.communityType && (
-                            <div className="pt-2">
-                              <Badge variant="outline" className="text-xs">
-                                {property.communityType}
-                              </Badge>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Action Button - Fixed at bottom */}
-                        <motion.div
-                          className="pt-4 mt-auto"
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <Button 
-                            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                            onClick={() => setShowContactForm(true)}
+                          {/* Action Button - Fixed at bottom */}
+                          <motion.div
+                            className="pt-4 mt-auto"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
                           >
-                            View Details →
-                          </Button>
-                        </motion.div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
+                            <Button 
+                              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                              onClick={() => setShowContactForm(true)}
+                            >
+                              View Details →
+                            </Button>
+                          </motion.div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  );
+                })}
               </motion.div>
 
               {/* Action Buttons Section */}
@@ -549,8 +605,6 @@ export default function PropertyResultsNew({ properties, preferences }: Property
                   </motion.div>
                 </motion.div>
               )}
-
-
 
               {/* Contact Form Dialog */}
               <Dialog open={showContactForm} onOpenChange={setShowContactForm}>
@@ -621,8 +675,8 @@ export default function PropertyResultsNew({ properties, preferences }: Property
                         <PopoverContent className="w-auto p-0">
                           <CalendarComponent
                             mode="single"
-                            selected={formData.date}
-                            onSelect={(date) => setFormData({...formData, date})}
+                            selected={formData.date || undefined}
+                            onSelect={(date) => setFormData({...formData, date: date || null})}
                             disabled={(date) => date < new Date() || date.getDay() === 0}
                             initialFocus
                           />
@@ -979,8 +1033,8 @@ export default function PropertyResultsNew({ properties, preferences }: Property
                 <PopoverContent className="w-auto p-0">
                   <CalendarComponent
                     mode="single"
-                    selected={formData.date}
-                    onSelect={(date) => setFormData({...formData, date})}
+                    selected={formData.date || undefined}
+                    onSelect={(date) => setFormData({...formData, date: date || null})}
                     disabled={(date) => date < new Date() || date.getDay() === 0}
                     initialFocus
                   />
@@ -1070,7 +1124,7 @@ export default function PropertyResultsNew({ properties, preferences }: Property
 
       {/* PDF Download Form */}
       <PDFDownloadForm
-        properties={allProperties}
+        properties={allProperties as any}
         isOpen={showPDFForm}
         onClose={() => setShowPDFForm(false)}
       />

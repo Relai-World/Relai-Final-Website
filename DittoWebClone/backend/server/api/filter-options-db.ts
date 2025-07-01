@@ -12,11 +12,42 @@ export async function getFilterOptionsHandler(req: Request, res: Response) {
     
     // Query for unique configurations
     const configurationsData = await Property.distinct('configurations');
-    const configurations = configurationsData.filter(Boolean);
+    // Flatten, normalize, and deduplicate configuration types
+    const configurationTypes = Array.from(new Set(
+      configurationsData
+        .flatMap((item: any) => {
+          if (typeof item === 'string') return [item];
+          if (Array.isArray(item)) return item.map(cfg => typeof cfg === 'object' && cfg.type ? cfg.type : cfg).filter(Boolean);
+          if (typeof item === 'object' && item && item.type) return [item.type];
+          return [];
+        })
+        .filter(Boolean)
+        .map((type: string) => type.trim())
+        .filter((type: string) => type && type.toLowerCase() !== 'n/a' && type.toLowerCase() !== 'not specified')
+        .map((type: string) => {
+          // Remove BHK, -BHK, and whitespace, and normalize delimiters
+          let cleaned = type.replace(/\s*BHK\s*/gi, '').replace(/-BHK/gi, '').replace(/\s+/g, '');
+          cleaned = cleaned.replace(/&/g, ',').replace(/\//g, ',').replace(/\+/g, ',').replace(/\band\b/gi, ',');
+          // Split, sort numerically, and join back for combinations
+          let parts = cleaned.split(',').map(s => s.trim()).filter(Boolean);
+          parts = parts.map(p => isNaN(Number(p)) ? p : Number(p));
+          parts = parts.sort((a, b) => (typeof a === 'number' && typeof b === 'number') ? a - b : String(a).localeCompare(String(b)));
+          return parts.join(',');
+        })
+        .filter(Boolean)
+    )).sort((a, b) => {
+      // Try to sort numerically by first number
+      const aNum = parseFloat(a.split(',')[0]);
+      const bNum = parseFloat(b.split(',')[0]);
+      if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
+      return a.localeCompare(b);
+    });
     
     // Query for unique locations
-    const locationsData = await Property.distinct('location');
+    const locationsData = await Property.distinct('Area');
+    console.log('Locations data:', locationsData);
     const locations = locationsData.filter(Boolean);
+    console.log('Locations:', locations);
     
     // Static possession options
     const possessionOptions = [
@@ -44,7 +75,7 @@ export async function getFilterOptionsHandler(req: Request, res: Response) {
     
     res.json({
       propertyTypes,
-      configurations,
+      configurations: configurationTypes,
       locations,
       possessionOptions,
       priceRange

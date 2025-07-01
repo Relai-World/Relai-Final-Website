@@ -257,17 +257,7 @@ export default function PropertyComparisonPage() {
                       {property.PossessionDate || property.possessionDate || 'TBD'}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Community Type:</span>
-                    <span className="font-semibold">
-                      {(() => {
-                        // Access the raw Supabase data directly from the API response
-                        const apiProperty = availableProperties.find(p => p.id === property.id) || selectedProperties.find(p => p.id === property.id);
-                        const communityType = apiProperty?.['Type of Community'] || property.communityType;
-                        return communityType && communityType.trim() !== '' ? communityType : 'Information Not available';
-                      })()}
-                    </span>
-                  </div>
+                 
                 </div>
               </div>
 

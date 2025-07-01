@@ -30,8 +30,6 @@ export type PropertyPreference = {
   configuration?: string;
   locations?: string[];
   otherLocation?: string;
-  propertyType?: string; // Added property type field
-  communityType?: string;
   minBudget?: number;
   maxBudget?: number;
 };
@@ -85,7 +83,6 @@ export default function PropertyWizardPage() {
     configuration: "",
     locations: [],
     otherLocation: "",
-    communityType: "",
   });
   
   const [userInfo, setUserInfo] = useState<UserInfo>({
@@ -99,29 +96,36 @@ export default function PropertyWizardPage() {
   const { data: propertiesData, isLoading: isLoadingProperties } = useQuery({
     queryKey: ['/api/properties', propertyPreference, currentStep],
     queryFn: async () => {
-      if (currentStep !== 'results' || !propertyPreference.budget) {
+      if (currentStep !== 'results' || (!propertyPreference.minBudget && !propertyPreference.maxBudget)) {
         return { properties: [], total: 0 };
       }
 
       console.log('Fetching properties with preferences:', propertyPreference);
       
-      const requestBody = {
-        budget: propertyPreference.budget,
-        propertyType: propertyPreference.propertyType || 'any',
-        location: propertyPreference.locations?.length ? propertyPreference.locations.join(',') : 'any',
-        communityType: propertyPreference.communityType || 'any',
-        possessionTimeline: propertyPreference.possession || 'any'
-      };
+      // Build query parameters for the new API endpoint
+      const params = new URLSearchParams();
+      // Append in the correct order
+      if (propertyPreference.locations?.length) {
+        params.append('location', propertyPreference.locations.join(','));
+      }
+      if (propertyPreference.minBudget || propertyPreference.maxBudget) {
+        const baseProjectPrice = propertyPreference.minBudget || propertyPreference.maxBudget;
+        if (baseProjectPrice !== undefined) {
+          params.append('baseProjectPrice', baseProjectPrice.toString());
+        }
+      }
+      if (propertyPreference.configuration) {
+        params.append('configurations', propertyPreference.configuration);
+      }
+      if (propertyPreference.possession) {
+        params.append('Possession_date', propertyPreference.possession);
+      }
 
-      console.log('API Request body:', requestBody);
+      const queryString = params.toString().replace(/\+/g, '%20');
+      console.log('API Request URL params:', queryString);
 
-      const response = await fetch('/api/properties', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
+      const response = await fetch(`http://localhost:5001/api/wizard-properties?${queryString}`);
+      console.log('API Response:', response);
 
       if (!response.ok) {
         throw new Error('Failed to fetch properties');
@@ -141,14 +145,46 @@ export default function PropertyWizardPage() {
     
     // Handle different budget formats
     if (data.budget && data.budget.includes('-') && !data.budget.includes('above') && !data.budget.includes('under')) {
-      // Budget format is "min-max" in crores - convert to actual numbers
-      const [minBudgetCr, maxBudgetCr] = data.budget.split('-').map(val => parseFloat(val.trim()));
-      
-      // Convert crores to actual rupee values (1 crore = 10,000,000)
-      processedData.minBudget = minBudgetCr * 10000000;
-      processedData.maxBudget = maxBudgetCr * 10000000;
-      
-      console.log(`Budget converted: ${minBudgetCr}Cr-${maxBudgetCr}Cr = ${processedData.minBudget}-${processedData.maxBudget} rupees`);
+      // Handle formats like "75-1-crore" meaning "75 lakhs to 1 crore"
+      if (data.budget.includes('-crore')) {
+        const budgetParts = data.budget.split('-');
+        if (budgetParts.length >= 3 && budgetParts[2] === 'crore') {
+          // Handle "75-1-crore" format (lakhs to crores)
+          if (budgetParts[0] === '75' && budgetParts[1] === '1') {
+            const minBudgetL = parseFloat(budgetParts[0].trim()); // 75 lakhs
+            const maxBudgetCr = parseFloat(budgetParts[1].trim()); // 1 crore
+            
+            // Convert to rupees: 1 lakh = 100,000, 1 crore = 10,000,000
+            processedData.minBudget = minBudgetL * 100000;
+            processedData.maxBudget = maxBudgetCr * 10000000;
+            
+            console.log(`Budget converted: ${minBudgetL}L-${maxBudgetCr}Cr = ${processedData.minBudget}-${processedData.maxBudget} rupees`);
+          } else {
+            // Handle "1-1.5-crore" and "1.5-2-crore" formats (both in crores)
+            const minBudgetCr = parseFloat(budgetParts[0].trim());
+            const maxBudgetCr = parseFloat(budgetParts[1].trim());
+            
+            // Convert crores to rupees
+            processedData.minBudget = minBudgetCr * 10000000;
+            processedData.maxBudget = maxBudgetCr * 10000000;
+            
+            console.log(`Budget converted: ${minBudgetCr}Cr-${maxBudgetCr}Cr = ${processedData.minBudget}-${processedData.maxBudget} rupees`);
+          }
+        }
+      } else if (data.budget.includes('-lakhs')) {
+        // Handle formats like "50-75-lakhs"
+        const budgetParts = data.budget.split('-');
+        if (budgetParts.length >= 2) {
+          const minBudgetL = parseFloat(budgetParts[0].trim());
+          const maxBudgetL = parseFloat(budgetParts[1].trim());
+          
+          // Convert lakhs to rupees
+          processedData.minBudget = minBudgetL * 100000;
+          processedData.maxBudget = maxBudgetL * 100000;
+          
+          console.log(`Budget converted: ${minBudgetL}L-${maxBudgetL}L = ${processedData.minBudget}-${processedData.maxBudget} rupees`);
+        }
+      }
     } else if (data.budget && data.budget.includes('above')) {
       // Handle "above-2-crore" format
       const match = data.budget.match(/above-(\d+(?:\.\d+)?)-crore/);
@@ -159,8 +195,8 @@ export default function PropertyWizardPage() {
         console.log(`Budget Above ${minBudgetCr}Cr = ${processedData.minBudget}+ rupees`);
       }
     } else if (data.budget && data.budget.includes('under')) {
-      // Handle "under-50l" format  
-      const match = data.budget.match(/under-(\d+)l/);
+      // Handle "under-50-lakhs" format  
+      const match = data.budget.match(/under-(\d+)-lakhs/);
       if (match) {
         const maxBudgetL = parseFloat(match[1]);
         processedData.minBudget = undefined; // No lower limit
@@ -737,3 +773,4 @@ export default function PropertyWizardPage() {
     </div>
   );
 }
+

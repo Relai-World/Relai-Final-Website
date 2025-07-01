@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,8 +36,6 @@ const formSchema = z.object({
   configuration: z.string().optional(),
   locations: z.array(z.string()).optional(),
   otherLocation: z.string().optional(),
-  propertyType: z.string().optional(), // Added property type field
-  communityType: z.string().optional(),
 });
 
 interface PropertyPreferenceFormProps {
@@ -66,9 +64,25 @@ interface FilterOptions {
 // Define the FormValues type explicitly from the schema
 type FormValues = z.infer<typeof formSchema>;
 
+// Helper to process and display configuration options as 'X BHK', splitting on comma or dash
+function getDisplayConfigurations(configurations: string[] = []) {
+  const bhkSet = new Set<string>();
+  configurations.forEach(cfg => {
+    cfg.split(/,|-/).forEach(part => {
+      const trimmed = part.trim();
+      if (trimmed && trimmed !== '-') {
+        bhkSet.add(trimmed + ' BHK');
+      }
+    });
+  });
+  // Sort numerically
+  return Array.from(bhkSet).sort((a, b) => parseFloat(a) - parseFloat(b));
+}
+
 export default function PropertyPreferenceForm({ initialValues, onSubmit }: PropertyPreferenceFormProps) {
   // State for location search
   const [locationSearch, setLocationSearch] = useState("");
+  const [dates, setDates] = useState([]);
 
   // Fetch price ranges from the API
   const { data: priceRange, isLoading: isLoadingPriceRange } = useQuery<PriceRange>({
@@ -107,7 +121,6 @@ export default function PropertyPreferenceForm({ initialValues, onSubmit }: Prop
       configuration: initialValues.configuration || "",
       locations: initialValues.locations || [],
       otherLocation: initialValues.otherLocation || "",
-      communityType: initialValues.communityType || "",
     },
   });
   
@@ -163,6 +176,13 @@ export default function PropertyPreferenceForm({ initialValues, onSubmit }: Prop
     visible: { y: 0, opacity: 1 }
   };
 
+  useEffect(() => {
+    console.log("Fetching possession dates");
+    fetch("http://localhost:5001/api/wizard-properties/unique-possession-dates")
+      .then(res => res.json())
+      .then(data => setDates(data.dates || []));
+  }, []);
+
   return (
     <div className="space-y-6">
       <motion.div 
@@ -178,18 +198,16 @@ export default function PropertyPreferenceForm({ initialValues, onSubmit }: Prop
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit((formData) => {
-            // Convert form data to PropertyPreference type
-            // We need this because the form schema has optional fields while PropertyPreference has required fields
-            const propertyPreference: PropertyPreference = {
-              ...formData,
-              budget: formData.budget || "",
-              possession: formData.possession || "",
-              configuration: formData.configuration || "",
-              locations: formData.locations || [],
-              communityType: formData.communityType || "",
-            };
-            onSubmit(propertyPreference);
-          })}>
+          // Convert form data to PropertyPreference type
+          const propertyPreference: PropertyPreference = {
+            ...formData,
+            budget: formData.budget || "",
+            possession: formData.possession || "",
+            configuration: formData.configuration || "",
+            locations: formData.locations || [],
+          };
+          onSubmit(propertyPreference);
+        })}>
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -257,44 +275,15 @@ export default function PropertyPreferenceForm({ initialValues, onSubmit }: Prop
                         <SelectItem value="not-decided" className="border-b border-gray-200 mb-1 pb-1 font-medium text-blue-600">
                           Not decided yet
                         </SelectItem>
-                        <SelectItem value="ready-to-move">Ready to Move In</SelectItem>
-                        <SelectItem value="3-6-months">3-6 Months</SelectItem>
-                        <SelectItem value="6-12-months">6-12 Months</SelectItem>
-                        <SelectItem value="1-2-years">1-2 Years</SelectItem>
-                        <SelectItem value="more-than-2-years">More than 2 Years</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </motion.div>
-
-            {/* Property Type */}
-            <motion.div variants={itemVariants}>
-              <FormField
-                control={form.control}
-                name="propertyType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center text-lg font-semibold">
-                      <Home className="h-5 w-5 mr-2 text-[#1752FF]" />
-                      Property Type
-                    </FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select property type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="not-decided" className="border-b border-gray-200 mb-1 pb-1 font-medium text-blue-600">
-                          Not decided yet
-                        </SelectItem>
-                        <SelectItem value="Apartment">Apartment</SelectItem>
-                        <SelectItem value="Villa">Villa</SelectItem>
-                        <SelectItem value="Plot">Plot</SelectItem>
-                        <SelectItem value="Commercial">Commercial</SelectItem>
+                        {dates.length === 0 ? (
+                          <SelectItem value="loading" disabled>Loading dates...</SelectItem>
+                        ) : (
+                          dates.map((date: string) => (
+                            <SelectItem key={date} value={date}>
+                              {date}
+                            </SelectItem>
+                          ))
+                        )}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -317,17 +306,24 @@ export default function PropertyPreferenceForm({ initialValues, onSubmit }: Prop
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select property type" />
+                          <SelectValue placeholder="Select property configuration" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="not-decided" className="border-b border-gray-200 mb-1 pb-1 font-medium text-blue-600">
                           Not decided yet
                         </SelectItem>
-                        <SelectItem value="1BHK">1BHK</SelectItem>
-                        <SelectItem value="2BHK">2BHK</SelectItem>
-                        <SelectItem value="3BHK">3BHK</SelectItem>
-                        <SelectItem value="4BHK">4BHK</SelectItem>
+                        {isLoadingFilterOptions ? (
+                          <SelectItem value="loading" disabled>Loading configurations...</SelectItem>
+                        ) : filterOptions?.configurations && filterOptions.configurations.length > 0 ? (
+                          <ScrollArea className="h-[200px]">
+                            {getDisplayConfigurations(filterOptions.configurations).map((config: string) => (
+                              <SelectItem key={config} value={config}>{config}</SelectItem>
+                            ))}
+                          </ScrollArea>
+                        ) : (
+                          <SelectItem value="no-results" disabled>No configurations found</SelectItem>
+                        )}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -489,38 +485,6 @@ export default function PropertyPreferenceForm({ initialValues, onSubmit }: Prop
               />
             </motion.div>
 
-            {/* Community Type */}
-            <motion.div variants={itemVariants}>
-              <FormField
-                control={form.control}
-                name="communityType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center text-lg font-semibold">
-                      <Home className="h-5 w-5 mr-2 text-[#1752FF]" />
-                      Community Type
-                    </FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select community type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="not-decided" className="border-b border-gray-200 mb-1 pb-1 font-medium text-blue-600">
-                          Not decided yet
-                        </SelectItem>
-                        <SelectItem value="gated-community">Gated Community</SelectItem>
-                        <SelectItem value="standalone">Standalone Building</SelectItem>
-                        <SelectItem value="both">No Preference</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </motion.div>
-
             {/* Submit Button */}
             <motion.div variants={itemVariants} className="pt-4">
               <motion.div
@@ -542,3 +506,5 @@ export default function PropertyPreferenceForm({ initialValues, onSubmit }: Prop
     </div>
   );
 }
+
+

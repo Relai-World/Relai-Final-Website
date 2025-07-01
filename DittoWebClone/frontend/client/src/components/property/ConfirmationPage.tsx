@@ -89,15 +89,15 @@ const getPossessionText = (value?: string) => {
   if (!value) return "Not specified";
   if (value === "not-decided") return "Not decided yet";
   
-  const map: {[key: string]: string} = {
-    "ready-to-move": "Ready to Move In",
-    "3-6-months": "3-6 Months",
-    "6-12-months": "6-12 Months",
-    "1-2-years": "1-2 Years",
-    "more-than-2-years": "More than 2 Years"
-  };
-  return map[value] || value;
-};
+//   const map: {[key: string]: string} = {
+//     "ready-to-move": "Ready to Move In",
+//     "3-6-months": "3-6 Months",
+//     "6-12-months": "6-12 Months",
+//     "1-2-years": "1-2 Years",
+//     "more-than-2-years": "More than 2 Years"
+//   };
+//   return map[value] || value;
+// };
 
 const getConfigurationText = (value?: string) => {
   if (!value) return "Not specified";
@@ -296,10 +296,10 @@ export default function ConfirmationPage({ propertyPreference, userInfo }: Confi
           
           <div className="flex items-start">
             <Home className="h-4 w-4 text-[#1752FF] mr-2 mt-0.5" />
-            <div>
+            {/* <div>
               <p className="text-sm text-gray-500">Community Type</p>
               <p className="font-medium">{getCommunityTypeText(propertyPreference.communityType)}</p>
-            </div>
+            </div> */}
           </div>
           
           <div className="flex items-start col-span-1 md:col-span-2">

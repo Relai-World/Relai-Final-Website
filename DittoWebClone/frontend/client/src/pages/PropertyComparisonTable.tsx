@@ -590,7 +590,7 @@ export default function PropertyComparisonTable() {
             </div>
 
             {/* Community Type */}
-            <div className="grid items-center py-5 px-6 bg-gradient-to-r from-violet-50 to-purple-50" style={{ gridTemplateColumns: `280px repeat(${selectedProperties.length}, 1fr)` }}>
+            {/* <div className="grid items-center py-5 px-6 bg-gradient-to-r from-violet-50 to-purple-50" style={{ gridTemplateColumns: `280px repeat(${selectedProperties.length}, 1fr)` }}>
               <div className="font-semibold text-gray-900 flex items-center">
                 <Building className="w-5 h-5 mr-2 text-violet-600" />
                 Community Type
@@ -602,7 +602,7 @@ export default function PropertyComparisonTable() {
                   </span>
                 </div>
               ))}
-            </div>
+            </div> */}
 
             {/* Action Buttons */}
             <div className="grid items-center py-6 px-6" style={{ gridTemplateColumns: `280px repeat(${selectedProperties.length}, 1fr)` }}>
