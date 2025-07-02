@@ -16,7 +16,10 @@ import {
   TrendingDown,
   Award,
   Crown,
-  Shield
+  Shield,
+  IndianRupee,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 
@@ -155,7 +158,12 @@ export default function PropertyComparisonTable() {
               <div key={property.id} className="bg-white/10 backdrop-blur-sm rounded-lg p-3 flex-1">
                 <div className="text-sm font-medium text-blue-100">Property {index + 1}</div>
                 <div className="font-bold text-white truncate">
-                  {property.ProjectName || property.projectName}
+                  {(property.ProjectName || property.projectName || property.name || '').toUpperCase()}
+                </div>
+                <div className="w-full mt-1">
+                  <span className="block text-xs font-semibold text-white/80 drop-shadow-md text-left pl-0.5" style={{textShadow: '0 1px 6px rgba(30,41,59,0.18)'}}>
+                    By {property.BuilderName || property.builderName || property.DeveloperName || property.developerName || 'N/A'}
+                  </span>
                 </div>
               </div>
             ))}
@@ -197,15 +205,11 @@ export default function PropertyComparisonTable() {
           {!isLoading && availableProperties.map((property: any) => (
               <div key={property.id} className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
                 <h3 className="font-semibold text-sm mb-1 line-clamp-2">
-                  {property.ProjectName || property.projectName || property.name}
+                  {(property.ProjectName || property.projectName || property.name || '').toUpperCase()}
                 </h3>
                 <p className="text-xs text-gray-600 mb-2">
-                  By {property.DeveloperName || property.developerName}
+                  By {property.BuilderName || property.builderName || property.DeveloperName || property.developerName || 'N/A'}
                 </p>
-                <div className="flex items-center text-xs text-gray-500 mb-3">
-                  <MapPin className="w-3 h-3 mr-1" />
-                  <span>{property.Location || property.location}</span>
-                </div>
                 <Button
                   size="sm"
                   onClick={() => addPropertyToComparison(property)}
@@ -247,14 +251,12 @@ export default function PropertyComparisonTable() {
                       <Building className="w-6 h-6 text-blue-600" />
                     </div>
                     <h3 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-2 min-h-[2.5rem]">
-                      {property.ProjectName || property.projectName || property.name}
+                      {(property.ProjectName || property.projectName || property.name || '').toUpperCase()}
                     </h3>
-                    <p className="text-xs text-gray-600 mb-2">
-                      By {property.DeveloperName || property.developerName}
-                    </p>
-                    <div className="flex items-center justify-center text-xs text-gray-500">
-                      <MapPin className="w-3 h-3 mr-1" />
-                      <span className="truncate">{property.Location || property.location}</span>
+                    <div className="flex flex-col items-center mt-2 space-y-1">
+                      <span className="text-xs font-medium text-gray-800">
+                        By {property.BuilderName || property.builderName || property.DeveloperName || property.developerName || 'N/A'}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -272,23 +274,72 @@ export default function PropertyComparisonTable() {
                 Price Range
               </div>
               {selectedProperties.map((property, index) => {
-                const minBudget = property.minimumBudget || property.price || 0;
-                const maxBudget = property.maximumBudget || 0;
-                const avgPrice = (minBudget + maxBudget) / 2;
-                
+                // Get all BaseProjectPrice values from configurations/components
+                let basePrices: number[] = [];
+                const configs = property.configurations || property.Configurations;
+                if (Array.isArray(configs)) {
+                  configs.forEach((conf: any) => {
+                    if (typeof conf === 'object' && conf !== null && 'BaseProjectPrice' in conf) {
+                      const val = Number(conf.BaseProjectPrice);
+                      if (!isNaN(val)) basePrices.push(val);
+                    }
+                  });
+                }
+                // Fallback to minimumBudget/maximumBudget if no BaseProjectPrice
+                if (basePrices.length === 0) {
+                  if (typeof property.minimumBudget === 'number' && !isNaN(property.minimumBudget)) basePrices.push(property.minimumBudget);
+                  if (typeof property.maximumBudget === 'number' && !isNaN(property.maximumBudget)) basePrices.push(property.maximumBudget);
+                  if (typeof property.price === 'number' && !isNaN(property.price)) basePrices.push(property.price);
+                }
+                let priceDisplay = 'Price not available';
+                if (basePrices.length > 0) {
+                  const min = Math.min(...basePrices);
+                  const max = Math.max(...basePrices);
+                  if (min === max) {
+                    priceDisplay = `₹${min.toLocaleString()}`;
+                  } else {
+                    priceDisplay = `₹${min.toLocaleString()} - ₹${max.toLocaleString()}`;
+                  }
+                }
+                // Best value logic remains the same
+                const avgPrice = basePrices.length > 0 ? (Math.min(...basePrices) + Math.max(...basePrices)) / 2 : 0;
                 const bestPriceIndex = getBestProperty(selectedProperties, (p) => {
-                  const min = p.minimumBudget || p.price || 0;
-                  const max = p.maximumBudget || 0;
-                  return (min + max) / 2;
+                  let prices: number[] = [];
+                  const cs = p.configurations || p.Configurations;
+                  if (Array.isArray(cs)) {
+                    cs.forEach((conf: any) => {
+                      if (typeof conf === 'object' && conf !== null && 'BaseProjectPrice' in conf) {
+                        const val = Number(conf.BaseProjectPrice);
+                        if (!isNaN(val)) prices.push(val);
+                      }
+                    });
+                  }
+                  if (prices.length === 0) {
+                    if (typeof p.minimumBudget === 'number' && !isNaN(p.minimumBudget)) prices.push(p.minimumBudget);
+                    if (typeof p.maximumBudget === 'number' && !isNaN(p.maximumBudget)) prices.push(p.maximumBudget);
+                    if (typeof p.price === 'number' && !isNaN(p.price)) prices.push(p.price);
+                  }
+                  return prices.length > 0 ? (Math.min(...prices) + Math.max(...prices)) / 2 : 0;
                 }, true); // lower is better for price
-                
-                const isBest = index === bestPriceIndex;
+                const isBest = index === bestPriceIndex && priceDisplay !== 'Price not available';
                 const isWorst = selectedProperties.length > 1 && !isBest && avgPrice === Math.max(...selectedProperties.map(p => {
-                  const min = p.minimumBudget || p.price || 0;
-                  const max = p.maximumBudget || 0;
-                  return (min + max) / 2;
+                  let prices: number[] = [];
+                  const cs = p.configurations || p.Configurations;
+                  if (Array.isArray(cs)) {
+                    cs.forEach((conf: any) => {
+                      if (typeof conf === 'object' && conf !== null && 'BaseProjectPrice' in conf) {
+                        const val = Number(conf.BaseProjectPrice);
+                        if (!isNaN(val)) prices.push(val);
+                      }
+                    });
+                  }
+                  if (prices.length === 0) {
+                    if (typeof p.minimumBudget === 'number' && !isNaN(p.minimumBudget)) prices.push(p.minimumBudget);
+                    if (typeof p.maximumBudget === 'number' && !isNaN(p.maximumBudget)) prices.push(p.maximumBudget);
+                    if (typeof p.price === 'number' && !isNaN(p.price)) prices.push(p.price);
+                  }
+                  return prices.length > 0 ? (Math.min(...prices) + Math.max(...prices)) / 2 : 0;
                 }));
-                
                 return (
                   <div key={property.id} className={`text-center p-4 rounded-lg transition-all ${
                     isBest ? 'bg-green-100 border-2 border-green-300' : 
@@ -298,7 +349,7 @@ export default function PropertyComparisonTable() {
                       <span className={`font-bold text-lg ${
                         isBest ? 'text-green-700' : isWorst ? 'text-red-600' : 'text-blue-600'
                       }`}>
-                        {formatPriceRange(minBudget, maxBudget)}
+                        {priceDisplay}
                       </span>
                       <ComparisonIndicator isBest={isBest} isWorst={isWorst} />
                     </div>
@@ -310,81 +361,171 @@ export default function PropertyComparisonTable() {
             </div>
 
             {/* Price per sq ft */}
-            <div className="grid items-center py-5 px-6 bg-gradient-to-r from-gray-50 to-slate-50" style={{ gridTemplateColumns: `280px repeat(${selectedProperties.length}, 1fr)` }}>
-              <div className="font-semibold text-gray-900 flex items-center">
-                <Building className="w-5 h-5 mr-2 text-gray-600" />
+            <div className="grid items-center py-6 px-6 bg-gradient-to-r from-blue-50 to-indigo-50" style={{ gridTemplateColumns: `280px repeat(${selectedProperties.length}, 1fr)` }}>
+              <div className="font-semibold text-blue-900 flex items-center">
+                <IndianRupee className="w-5 h-5 mr-2 text-blue-600" />
                 Price/sq ft
               </div>
               {selectedProperties.map((property, index) => {
-                const pricePerSqft = Number(property['Project Price per SFT']) || 0;
-                
-                const bestPricePerSqftIndex = getBestProperty(selectedProperties, (p) => 
-                  Number(p['Project Price per SFT']) || 0, true);
-                
-                const isBest = index === bestPricePerSqftIndex && pricePerSqft > 0;
-                const isWorst = selectedProperties.length > 1 && !isBest && pricePerSqft > 0 && 
-                  pricePerSqft === Math.max(...selectedProperties.map(p => Number(p['Project Price per SFT']) || 0));
-                
+                let priceSqftArr: number[] = [];
+                const configs = property.configurations || property.Configurations;
+                if (Array.isArray(configs)) {
+                  configs.forEach((conf: any) => {
+                    if (typeof conf === 'object' && conf !== null) {
+                      const val = conf.Price_per_sft || conf.price_per_sft || conf.PricePerSqft || conf.pricePerSqft;
+                      if (typeof val === 'number' && !isNaN(val)) priceSqftArr.push(val);
+                    }
+                  });
+                }
+                if (priceSqftArr.length === 0 && (typeof property.Price_per_sft === 'number' || typeof property.price_per_sft === 'number')) {
+                  if (typeof property.Price_per_sft === 'number' && !isNaN(property.Price_per_sft)) priceSqftArr.push(property.Price_per_sft);
+                  if (typeof property.price_per_sft === 'number' && !isNaN(property.price_per_sft)) priceSqftArr.push(property.price_per_sft);
+                }
+                let priceSqftDisplay = '₹N/A';
+                if (priceSqftArr.length > 0) {
+                  const min = Math.min(...priceSqftArr);
+                  const max = Math.max(...priceSqftArr);
+                  if (min === max) {
+                    priceSqftDisplay = `₹${min.toLocaleString()}`;
+                  } else {
+                    priceSqftDisplay = `₹${min.toLocaleString()} - ₹${max.toLocaleString()}`;
+                  }
+                }
+                // Determine best and highest
+                let avg = 0;
+                if (priceSqftArr.length > 0) {
+                  avg = (Math.min(...priceSqftArr) + Math.max(...priceSqftArr)) / 2;
+                }
+                const bestIndex = getBestProperty(selectedProperties, (p) => {
+                  let arr: number[] = [];
+                  const cs = p.configurations || p.Configurations;
+                  if (Array.isArray(cs)) {
+                    cs.forEach((conf: any) => {
+                      if (typeof conf === 'object' && conf !== null) {
+                        const val = conf.Price_per_sft || conf.price_per_sft || conf.PricePerSqft || conf.pricePerSqft;
+                        if (typeof val === 'number' && !isNaN(val)) arr.push(val);
+                      }
+                    });
+                  }
+                  if (arr.length === 0 && (typeof p.Price_per_sft === 'number' || typeof p.price_per_sft === 'number')) {
+                    if (typeof p.Price_per_sft === 'number' && !isNaN(p.Price_per_sft)) arr.push(p.Price_per_sft);
+                    if (typeof p.price_per_sft === 'number' && !isNaN(p.price_per_sft)) arr.push(p.price_per_sft);
+                  }
+                  return arr.length > 0 ? (Math.min(...arr) + Math.max(...arr)) / 2 : Infinity;
+                }, true); // lower is better
+                const isBest = index === bestIndex && priceSqftArr.length > 0;
+                const isHighest = selectedProperties.length > 1 && !isBest && avg === Math.max(...selectedProperties.map(p => {
+                  let arr: number[] = [];
+                  const cs = p.configurations || p.Configurations;
+                  if (Array.isArray(cs)) {
+                    cs.forEach((conf: any) => {
+                      if (typeof conf === 'object' && conf !== null) {
+                        const val = conf.Price_per_sft || conf.price_per_sft || conf.PricePerSqft || conf.pricePerSqft;
+                        if (typeof val === 'number' && !isNaN(val)) arr.push(val);
+                      }
+                    });
+                  }
+                  if (arr.length === 0 && (typeof p.Price_per_sft === 'number' || typeof p.price_per_sft === 'number')) {
+                    if (typeof p.Price_per_sft === 'number' && !isNaN(p.Price_per_sft)) arr.push(p.Price_per_sft);
+                    if (typeof p.price_per_sft === 'number' && !isNaN(p.price_per_sft)) arr.push(p.price_per_sft);
+                  }
+                  return arr.length > 0 ? (Math.min(...arr) + Math.max(...arr)) / 2 : 0;
+                }));
                 return (
-                  <div key={property.id} className={`text-center p-3 rounded-lg transition-all ${
-                    isBest ? 'bg-green-100 border-2 border-green-300' : 
-                    isWorst ? 'bg-red-50 border border-red-200' : 'bg-white border border-gray-200'
-                  }`}>
-                    <div className="flex items-center justify-center">
-                      <span className={`font-bold ${
-                        isBest ? 'text-green-700' : isWorst ? 'text-red-600' : 'text-gray-900'
-                      }`}>
-                        {pricePerSqft ? `₹${pricePerSqft.toLocaleString()}` : '₹N/A'}
-                      </span>
-                      <ComparisonIndicator isBest={isBest} isWorst={isWorst} />
-                    </div>
+                  <div key={property.id} className="text-center p-3">
+                    <span className={`inline-flex items-center justify-center w-full font-semibold text-blue-800 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full shadow-md px-6 py-2 text-base border border-blue-200 ring-1 ring-inset ring-white/40 ${isBest ? 'ring-2 ring-green-400' : isHighest ? 'ring-2 ring-red-300' : ''}`} style={{boxShadow: '0 2px 8px 0 rgba(30,64,175,0.08), 0 1.5px 0 0 #fff inset'}}>
+                      <IndianRupee className="w-4 h-4 mr-2 text-blue-400" />
+                      {priceSqftDisplay}
+                      {isBest && <Crown className="w-4 h-4 ml-2 text-green-500" />}
+                      {isHighest && <ArrowUp className="w-4 h-4 ml-2 text-red-400" />}
+                    </span>
                     {isBest && <div className="text-xs text-green-600 font-medium mt-1">Best Rate</div>}
-                    {isWorst && <div className="text-xs text-red-500 font-medium mt-1">Highest Rate</div>}
+                    {isHighest && <div className="text-xs text-red-500 font-medium mt-1">Highest Rate</div>}
                   </div>
                 );
               })}
             </div>
 
             {/* Size Range */}
-            <div className="grid items-center py-5 px-6 bg-gradient-to-r from-emerald-50 to-teal-50" style={{ gridTemplateColumns: `280px repeat(${selectedProperties.length}, 1fr)` }}>
-              <div className="font-semibold text-gray-900 flex items-center">
-                <Award className="w-5 h-5 mr-2 text-emerald-600" />
+            <div className="grid items-center py-6 px-6 bg-gradient-to-r from-green-50 to-emerald-50" style={{ gridTemplateColumns: `280px repeat(${selectedProperties.length}, 1fr)` }}>
+              <div className="font-semibold text-emerald-900 flex items-center">
+                <svg className="w-5 h-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="2" rx="1"/><rect x="7" y="7" width="2" height="2" rx="1"/><rect x="15" y="15" width="2" height="2" rx="1"/></svg>
                 Size Range
               </div>
               {selectedProperties.map((property, index) => {
-                const minSize = property.MinSizeSqft || property.minSizeSqft || 0;
-                const maxSize = property.MaxSizeSqft || property.maxSizeSqft || 0;
-                const avgSize = (minSize + maxSize) / 2;
-                
-                const bestSizeIndex = getBestProperty(selectedProperties, (p) => {
-                  const min = p.MinSizeSqft || p.minSizeSqft || 0;
-                  const max = p.MaxSizeSqft || p.maxSizeSqft || 0;
-                  return (min + max) / 2;
-                });
-                
-                const isBest = index === bestSizeIndex && avgSize > 0;
-                const isWorst = selectedProperties.length > 1 && !isBest && avgSize > 0 && 
-                  avgSize === Math.min(...selectedProperties.map(p => {
-                    const min = p.MinSizeSqft || p.minSizeSqft || 0;
-                    const max = p.MaxSizeSqft || p.maxSizeSqft || 0;
-                    return (min + max) / 2;
-                  }).filter(size => size > 0));
-                
+                let sizes: number[] = [];
+                const configs = property.configurations || property.Configurations;
+                if (Array.isArray(configs)) {
+                  configs.forEach((conf: any) => {
+                    if (typeof conf === 'object' && conf !== null) {
+                      const size = conf.sizeRange || conf.size || conf.area || conf.Size || conf.superBuiltupArea;
+                      if (typeof size === 'number' && !isNaN(size)) sizes.push(size);
+                    }
+                  });
+                }
+                if (sizes.length === 0) {
+                  const fallback = property.minSizeSqft || property.area || property.Size;
+                  if (typeof fallback === 'number' && !isNaN(fallback)) sizes.push(fallback);
+                }
+                let sizeDisplay = 'N/A';
+                if (sizes.length > 0) {
+                  const min = Math.min(...sizes);
+                  const max = Math.max(...sizes);
+                  if (min === max) {
+                    sizeDisplay = `${min} sq ft`;
+                  } else {
+                    sizeDisplay = `${min} - ${max} sq ft`;
+                  }
+                }
+                let avg = 0;
+                if (sizes.length > 0) {
+                  avg = (Math.min(...sizes) + Math.max(...sizes)) / 2;
+                }
+                const bestIndex = getBestProperty(selectedProperties, (p) => {
+                  let arr: number[] = [];
+                  const cs = p.configurations || p.Configurations;
+                  if (Array.isArray(cs)) {
+                    cs.forEach((conf: any) => {
+                      if (typeof conf === 'object' && conf !== null) {
+                        const size = conf.sizeRange || conf.size || conf.area || conf.Size || conf.superBuiltupArea;
+                        if (typeof size === 'number' && !isNaN(size)) arr.push(size);
+                      }
+                    });
+                  }
+                  if (arr.length === 0) {
+                    const fallback = p.minSizeSqft || p.area || p.Size;
+                    if (typeof fallback === 'number' && !isNaN(fallback)) arr.push(fallback);
+                  }
+                  return arr.length > 0 ? (Math.min(...arr) + Math.max(...arr)) / 2 : 0;
+                }); // higher is better
+                const isBest = index === bestIndex && sizes.length > 0;
+                const isSmallest = selectedProperties.length > 1 && !isBest && avg === Math.min(...selectedProperties.map(p => {
+                  let arr: number[] = [];
+                  const cs = p.configurations || p.Configurations;
+                  if (Array.isArray(cs)) {
+                    cs.forEach((conf: any) => {
+                      if (typeof conf === 'object' && conf !== null) {
+                        const size = conf.sizeRange || conf.size || conf.area || conf.Size || conf.superBuiltupArea;
+                        if (typeof size === 'number' && !isNaN(size)) arr.push(size);
+                      }
+                    });
+                  }
+                  if (arr.length === 0) {
+                    const fallback = p.minSizeSqft || p.area || p.Size;
+                    if (typeof fallback === 'number' && !isNaN(fallback)) arr.push(fallback);
+                  }
+                  return arr.length > 0 ? (Math.min(...arr) + Math.max(...arr)) / 2 : Infinity;
+                }));
                 return (
-                  <div key={property.id} className={`text-center p-3 rounded-lg transition-all ${
-                    isBest ? 'bg-emerald-100 border-2 border-emerald-300' : 
-                    isWorst ? 'bg-orange-50 border border-orange-200' : 'bg-white border border-gray-200'
-                  }`}>
-                    <div className="flex items-center justify-center">
-                      <span className={`font-bold ${
-                        isBest ? 'text-emerald-700' : isWorst ? 'text-orange-600' : 'text-gray-900'
-                      }`}>
-                        {minSize && maxSize ? `${minSize} - ${maxSize} sq ft` : 'N/A'}
-                      </span>
-                      <ComparisonIndicator isBest={isBest} isWorst={isWorst} />
-                    </div>
-                    {isBest && <div className="text-xs text-emerald-600 font-medium mt-1">Largest Space</div>}
-                    {isWorst && <div className="text-xs text-orange-500 font-medium mt-1">Smallest Space</div>}
+                  <div key={property.id} className="text-center p-3">
+                    <span className={`inline-flex items-center justify-center w-full font-semibold text-emerald-800 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full shadow-md px-6 py-2 text-base border border-emerald-200 ring-1 ring-inset ring-white/40 ${isBest ? 'ring-2 ring-green-400' : isSmallest ? 'ring-2 ring-yellow-300' : ''}`} style={{boxShadow: '0 2px 8px 0 rgba(16,185,129,0.08), 0 1.5px 0 0 #fff inset'}}>
+                      <svg className="w-4 h-4 mr-2 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="2" rx="1"/><rect x="7" y="7" width="2" height="2" rx="1"/><rect x="15" y="15" width="2" height="2" rx="1"/></svg>
+                      {sizeDisplay}
+                      {isBest && <Crown className="w-4 h-4 ml-2 text-green-500" />}
+                      {isSmallest && <ArrowDown className="w-4 h-4 ml-2 text-yellow-400" />}
+                    </span>
+                    {isBest && <div className="text-xs text-green-600 font-medium mt-1">Largest Space</div>}
+                    {isSmallest && <div className="text-xs text-yellow-600 font-medium mt-1">Smallest Space</div>}
                   </div>
                 );
               })}
@@ -399,7 +540,22 @@ export default function PropertyComparisonTable() {
               {selectedProperties.map((property) => (
                 <div key={property.id} className="text-center p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
                   <span className="font-bold text-purple-700 bg-purple-100 px-3 py-1 rounded-full text-sm">
-                    {property.Configurations || property.configurations || 'N/A'}
+                    {(() => {
+                      const conf = property.Configurations || property.configurations;
+                      if (!conf) return 'N/A';
+                      let uniqueConfigs: string[] = [];
+                      if (typeof conf === 'string') {
+                        uniqueConfigs = conf.split(',').map(c => c.trim().toUpperCase());
+                      } else if (Array.isArray(conf)) {
+                        uniqueConfigs = conf.map(c => typeof c === 'string' ? c.toUpperCase() : (c?.type ? String(c.type).toUpperCase() : ''));
+                      } else if (typeof conf === 'object') {
+                        if (conf.type) uniqueConfigs = [String(conf.type).toUpperCase()];
+                        else uniqueConfigs = [JSON.stringify(conf)];
+                      }
+                      // Remove empty and duplicate values
+                      uniqueConfigs = Array.from(new Set(uniqueConfigs.filter(Boolean)));
+                      return uniqueConfigs.join(', ');
+                    })()}
                   </span>
                 </div>
               ))}
@@ -420,74 +576,20 @@ export default function PropertyComparisonTable() {
               ))}
             </div>
 
-            {/* Total Units */}
-            <div className="grid items-center py-5 px-6 bg-gradient-to-r from-orange-50 to-amber-50" style={{ gridTemplateColumns: `280px repeat(${selectedProperties.length}, 1fr)` }}>
-              <div className="font-semibold text-gray-900 flex items-center">
-                <Building className="w-5 h-5 mr-2 text-orange-600" />
-                Total Units
+            {/* Location Row */}
+            <div className="grid items-center py-6 px-6 bg-gradient-to-r from-blue-50 to-indigo-50" style={{ gridTemplateColumns: `280px repeat(${selectedProperties.length}, 1fr)` }}>
+              <div className="font-semibold text-blue-900 flex items-center">
+                <MapPin className="w-5 h-5 mr-2 text-blue-600" />
+                Location
               </div>
-              {selectedProperties.map((property, index) => {
-                const totalUnits = Number(property.TotalUnits || property.totalUnits || 0);
-                
-                const bestUnitsIndex = getBestProperty(selectedProperties, (p) => 
-                  Number(p.TotalUnits || p.totalUnits || 0));
-                
-                const isBest = index === bestUnitsIndex && totalUnits > 0;
-                const isWorst = selectedProperties.length > 1 && !isBest && totalUnits > 0 && 
-                  totalUnits === Math.min(...selectedProperties.map(p => Number(p.TotalUnits || p.totalUnits || 0)).filter(units => units > 0));
-                
-                return (
-                  <div key={property.id} className={`text-center p-3 rounded-lg transition-all ${
-                    isBest ? 'bg-orange-100 border-2 border-orange-300' : 
-                    isWorst ? 'bg-gray-50 border border-gray-200' : 'bg-white border border-gray-200'
-                  }`}>
-                    <div className="flex items-center justify-center">
-                      <span className={`font-bold ${
-                        isBest ? 'text-orange-700' : 'text-gray-900'
-                      }`}>
-                        {totalUnits || 'N/A'}
-                      </span>
-                      <ComparisonIndicator isBest={isBest} isWorst={isWorst} />
-                    </div>
-                    {isBest && <div className="text-xs text-orange-600 font-medium mt-1">Most Units</div>}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Area Size */}
-            <div className="grid items-center py-5 px-6 bg-gradient-to-r from-cyan-50 to-teal-50" style={{ gridTemplateColumns: `280px repeat(${selectedProperties.length}, 1fr)` }}>
-              <div className="font-semibold text-gray-900 flex items-center">
-                <Award className="w-5 h-5 mr-2 text-cyan-600" />
-                Area Size
-              </div>
-              {selectedProperties.map((property, index) => {
-                const areaSize = Number(property.AreaSizeAcres || property.areaSizeAcres || 0);
-                
-                const bestAreaIndex = getBestProperty(selectedProperties, (p) => 
-                  Number(p.AreaSizeAcres || p.areaSizeAcres || 0));
-                
-                const isBest = index === bestAreaIndex && areaSize > 0;
-                const isWorst = selectedProperties.length > 1 && !isBest && areaSize > 0 && 
-                  areaSize === Math.min(...selectedProperties.map(p => Number(p.AreaSizeAcres || p.areaSizeAcres || 0)).filter(area => area > 0));
-                
-                return (
-                  <div key={property.id} className={`text-center p-3 rounded-lg transition-all ${
-                    isBest ? 'bg-cyan-100 border-2 border-cyan-300' : 
-                    isWorst ? 'bg-gray-50 border border-gray-200' : 'bg-white border border-gray-200'
-                  }`}>
-                    <div className="flex items-center justify-center">
-                      <span className={`font-bold ${
-                        isBest ? 'text-cyan-700' : 'text-gray-900'
-                      }`}>
-                        {areaSize ? `${areaSize} acres` : 'N/A'}
-                      </span>
-                      <ComparisonIndicator isBest={isBest} isWorst={isWorst} />
-                    </div>
-                    {isBest && <div className="text-xs text-cyan-600 font-medium mt-1">Largest Area</div>}
-                  </div>
-                );
-              })}
+              {selectedProperties.map((property) => (
+                <div key={property.id} className="text-center p-3">
+                  <span className="inline-flex items-center justify-center w-full font-semibold text-blue-800 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full shadow-md px-6 py-2 text-base border border-blue-200 ring-1 ring-inset ring-white/40" style={{boxShadow: '0 2px 8px 0 rgba(30,64,175,0.08), 0 1.5px 0 0 #fff inset'}}>
+                    <MapPin className="w-4 h-4 mr-2 text-blue-400" />
+                    {property.Area || property.Location || property.location || 'N/A'}
+                  </span>
+                </div>
+              ))}
             </div>
 
             {/* RERA Status */}
@@ -543,34 +645,45 @@ export default function PropertyComparisonTable() {
                 Possession
               </div>
               {selectedProperties.map((property, index) => {
-                const possessionDate = property.PossessionDate || property['PossessionDate'] || property.possessionDate;
+                // Try to fetch the actual possession date from various fields
+                const possessionRaw = property.Possession_date || property.PossessionDate || property.possessionDate || property['Possession_date'] || property['PossessionDate'];
                 let formattedDate = 'TBD';
-                let dateValue = null;
-                
-                if (possessionDate) {
-                  const [month, year] = possessionDate.split('-');
-                  if (month && year) {
-                    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                    formattedDate = `${monthNames[parseInt(month) - 1]} 20${year}`;
-                    dateValue = new Date(2000 + parseInt(year), parseInt(month) - 1);
+                if (possessionRaw && typeof possessionRaw === 'string') {
+                  // Try to parse DD-MM-YYYY, MM-YYYY, or MM-YY
+                  const parts = possessionRaw.split('-');
+                  if (parts.length === 3) {
+                    // DD-MM-YYYY
+                    const month = parseInt(parts[1], 10);
+                    const year = parts[2].length === 2 ? 2000 + parseInt(parts[2], 10) : parseInt(parts[2], 10);
+                    if (!isNaN(month) && !isNaN(year)) {
+                      formattedDate = `${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][month-1]} ${year}`;
+                    }
+                  } else if (parts.length === 2) {
+                    // MM-YYYY or MM-YY
+                    const month = parseInt(parts[0], 10);
+                    const year = parts[1].length === 2 ? 2000 + parseInt(parts[1], 10) : parseInt(parts[1], 10);
+                    if (!isNaN(month) && !isNaN(year)) {
+                      formattedDate = `${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][month-1]} ${year}`;
+                    }
                   } else {
-                    formattedDate = possessionDate;
+                    formattedDate = possessionRaw;
                   }
                 }
-                
                 const bestDateIndex = getBestProperty(selectedProperties, (p) => {
-                  const date = p.PossessionDate || p['PossessionDate'] || p.possessionDate;
-                  if (date) {
-                    const [m, y] = date.split('-');
-                    if (m && y) {
-                      return -(2000 + parseInt(y)) * 12 - parseInt(m); // Earlier dates are better (negative for reverse sort)
+                  const date = p.Possession_date || p.PossessionDate || p.possessionDate || p['Possession_date'] || p['PossessionDate'];
+                  if (date && typeof date === 'string') {
+                    const parts = date.split('-');
+                    if (parts.length === 3) {
+                      // DD-MM-YYYY
+                      return -(parseInt(parts[2], 10) * 12 + parseInt(parts[1], 10));
+                    } else if (parts.length === 2) {
+                      // MM-YYYY or MM-YY
+                      return -(parseInt(parts[1], 10) * 12 + parseInt(parts[0], 10));
                     }
                   }
                   return 0;
                 });
-                
                 const isBest = index === bestDateIndex && formattedDate !== 'TBD';
-                
                 return (
                   <div key={property.id} className={`text-center p-3 rounded-lg transition-all ${
                     isBest ? 'bg-pink-100 border-2 border-pink-300' : 'bg-white border border-gray-200'
