@@ -68,16 +68,36 @@ type FormValues = z.infer<typeof formSchema>;
 function getDisplayConfigurations(configurations: string[] = []) {
   const bhkSet = new Set<string>();
   configurations.forEach(cfg => {
-    cfg.split(/,|-/).forEach(part => {
-      const trimmed = part.trim();
-      if (trimmed && trimmed !== '-') {
-        bhkSet.add(trimmed + ' BHK');
-      }
-    });
+    if (typeof cfg === "string") {
+      cfg.split(/,|-/).forEach(part => {
+        const trimmed = part.trim();
+        console.log(trimmed);
+        if (trimmed && trimmed !== '-') {
+          bhkSet.add(trimmed + ' BHK');
+        }
+      });
+    }
   });
   // Sort numerically
-  return Array.from(bhkSet).sort((a, b) => parseFloat(a) - parseFloat(b));
+  return Array.from(bhkSet).sort((a, b) => {
+    const numA = parseFloat(a);
+    const numB = parseFloat(b);
+    if (isNaN(numA) && isNaN(numB)) return a.localeCompare(b); // Both non-numeric, sort alphabetically
+    if (isNaN(numA)) return 1; // Put non-numeric at the end
+    if (isNaN(numB)) return -1;
+    return numA - numB;
+  });
 }
+
+// Possession timeline options (copied from AllPropertiesPage)
+const possessionTimelineOptions = [
+  { label: 'Not decided yet', value: 'any' },
+  { label: 'Ready to Move In', value: 'ready' },
+  { label: '3-6 Months', value: '3-6' },
+  { label: '6-12 Months', value: '6-12' },
+  { label: '1-2 Years', value: '1-2' },
+  { label: 'More than 2 Years', value: '2plus' },
+];
 
 export default function PropertyPreferenceForm({ initialValues, onSubmit }: PropertyPreferenceFormProps) {
   // State for location search
@@ -176,13 +196,6 @@ export default function PropertyPreferenceForm({ initialValues, onSubmit }: Prop
     visible: { y: 0, opacity: 1 }
   };
 
-  useEffect(() => {
-    console.log("Fetching possession dates");
-    fetch("http://localhost:5001/api/wizard-properties/unique-possession-dates")
-      .then(res => res.json())
-      .then(data => setDates(data.dates || []));
-  }, []);
-
   return (
     <div className="space-y-6">
       <motion.div 
@@ -272,18 +285,11 @@ export default function PropertyPreferenceForm({ initialValues, onSubmit }: Prop
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="not-decided" className="border-b border-gray-200 mb-1 pb-1 font-medium text-blue-600">
-                          Not decided yet
-                        </SelectItem>
-                        {dates.length === 0 ? (
-                          <SelectItem value="loading" disabled>Loading dates...</SelectItem>
-                        ) : (
-                          dates.map((date: string) => (
-                            <SelectItem key={date} value={date}>
-                              {date}
-                            </SelectItem>
-                          ))
-                        )}
+                        {possessionTimelineOptions.map(option => (
+                          <SelectItem key={option.value} value={option.value} className={option.value === 'any' ? 'border-b border-gray-200 mb-1 pb-1 font-medium text-blue-600' : ''}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />

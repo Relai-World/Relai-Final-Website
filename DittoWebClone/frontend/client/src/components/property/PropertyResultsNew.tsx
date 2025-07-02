@@ -53,6 +53,23 @@ interface Property {
   Area?: string;
   BuilderName?: string;
   Possession_date?: string;
+  amenities?: (string | any)[];
+  features?: (string | any)[];
+  name?: string;
+  reraNumber?: string;
+  totalUnits?: number | string;
+  description?: string;
+  remarksComments?: string;
+  ProjectName?: string;
+  project_name?: string;
+  price?: number;
+  minSizeSqft?: number;
+  maxSizeSqft?: number;
+  RERA?: string;
+  rera?: string;
+  RERA_Number?: string;
+  Price_per_sft?: number;
+  price_per_sft?: number;
 }
 
 interface PropertyResultsNewProps {
@@ -93,6 +110,128 @@ const getPropertyImages = (property: Property): string[] => {
   // Filter out images that don't exist (you might want to implement proper file checking)
   return possibleImages;
 };
+
+// Helper to get property image path like All Properties page
+function getPropertyImagePath(property: Property): string {
+  if (property.images && property.images.length > 0) {
+    if (property.images[0].startsWith('http')) return property.images[0];
+    return `http://localhost:5001/property_images/${property.images[0]}`;
+  }
+  const name = (property.projectName || '').toLowerCase().replace(/\s+/g, '_20');
+  const loc = (property.location || property.Area || '').toLowerCase().replace(/\s+/g, '_20');
+  if (!name || !loc) return '/img/placeholder-property.png';
+  return `http://localhost:5001/property_images/${name}_${loc}_0.jpg`;
+}
+
+// Helper to format number as Indian currency (e.g., 6003720 -> 63,03,720)
+export function formatINR(num: number): string {
+  if (typeof num !== 'number' || isNaN(num)) return '';
+  return num.toLocaleString('en-IN');
+}
+
+// Utility to safely normalize a value to a number
+function safeToNumber(val: unknown): number | undefined {
+  if (typeof val === 'number' && !isNaN(val)) return val;
+  if (typeof val === 'string') {
+    const n = Number(val.replace(/[^\d.]/g, ''));
+    return isNaN(n) ? undefined : n;
+  }
+  return undefined;
+}
+
+export function normalizePropertyForPDF(property: Property): any {
+  // --- Price Range Logic (from PropertyComparisonTable) ---
+  let basePrices: number[] = [];
+  const configs = property.configurations || (property as any).Configurations;
+  if (Array.isArray(configs)) {
+    configs.forEach((conf: any) => {
+      if (typeof conf === 'object' && conf !== null && 'BaseProjectPrice' in conf) {
+        const val = safeToNumber(conf.BaseProjectPrice);
+        if (typeof val === 'number') basePrices.push(val);
+      }
+    });
+  }
+  if (basePrices.length === 0) {
+    const minB = safeToNumber(property.minimumBudget);
+    const maxB = safeToNumber(property.maximumBudget);
+    const price = safeToNumber(property.price);
+    if (typeof minB === 'number') basePrices.push(minB);
+    if (typeof maxB === 'number') basePrices.push(maxB);
+    if (typeof price === 'number') basePrices.push(price);
+  }
+  let priceRange = 'Price not available';
+  if (basePrices.length > 0) {
+    const min = Math.min(...basePrices);
+    const max = Math.max(...basePrices);
+    if (min === max) {
+      priceRange = `₹${formatINR(min)}`;
+    } else {
+      priceRange = `₹${formatINR(min)} - ₹${formatINR(max)}`;
+    }
+  }
+
+  // --- Size Range Logic (from PropertyComparisonTable) ---
+  let sizes: number[] = [];
+  if (Array.isArray(configs)) {
+    configs.forEach((conf: any) => {
+      if (typeof conf === 'object' && conf !== null) {
+        const size = conf.sizeRange || conf.size || conf.area || conf.Size || conf.superBuiltupArea;
+        if (typeof size === 'number' && !isNaN(size)) sizes.push(size);
+      }
+    });
+  }
+  if (sizes.length === 0) {
+    const fallback = property.minSizeSqft || property.area || (property as any).Size;
+    if (typeof fallback === 'number' && !isNaN(fallback)) sizes.push(fallback);
+  }
+  let sizeRange = 'N/A';
+  if (sizes.length > 0) {
+    const min = Math.min(...sizes);
+    const max = Math.max(...sizes);
+    if (min === max) {
+      sizeRange = `${min} sq ft`;
+    } else {
+      sizeRange = `${min} - ${max} sq ft`;
+    }
+  }
+
+  // --- RERA Number Logic (from PropertyComparisonTable) ---
+  const reraNumber = property.RERA_Number || (property as any)['RERA_Number'] || property.reraNumber || property.reraNumber || property.rera || property.RERA || '';
+
+  // Normalize configurations for display
+  let configurations = property.configurations;
+  if (Array.isArray(configurations)) {
+    configurations = configurations.map((conf: any) => typeof conf === 'string' ? conf : (conf.type || JSON.stringify(conf))).join(', ');
+  } else if (typeof configurations !== 'string') {
+    configurations = '';
+  }
+
+  // Normalize amenities and features
+  const amenities = Array.isArray(property.amenities)
+    ? property.amenities.map((a: any) => typeof a === 'string' ? a : JSON.stringify(a))
+    : [];
+  const features = Array.isArray(property.features)
+    ? property.features.map((f: any) => typeof f === 'string' ? f : JSON.stringify(f))
+    : [];
+
+  // Map all possible fields for PDF completeness
+  return {
+    id: property.id,
+    projectName: property.projectName || property.name || property.ProjectName || property.project_name || '',
+    location: property.location || property.Area || '',
+    propertyType: property.propertyType || '',
+    developerName: property.developerName || property.BuilderName || '',
+    configurations,
+    possessionDate: property.possessionDate || property.Possession_date || '',
+    priceRange,
+    sizeRange,
+    reraNumber,
+    totalUnits: property.totalUnits || '',
+    amenities,
+    features,
+    description: property.description || property.remarksComments || '',
+  };
+}
 
 export default function PropertyResultsNew({ properties, preferences }: PropertyResultsNewProps) {
   const [showAllProperties, setShowAllProperties] = useState(false);
@@ -426,31 +565,48 @@ export default function PropertyResultsNew({ properties, preferences }: Property
               </motion.div>
 
               {/* Property Grid */}
-              <motion.div 
-                className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-              >
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {displayProperties.map((property, index) => {
-                  // Get property images from property_images folder
-                  const propertyImages = getPropertyImages(property);
-                  
                   return (
                     <motion.div
                       key={property.id}
                       variants={cardVariants}
                       className={!showAllProperties && index >= 6 ? "blur-sm opacity-60 pointer-events-none" : ""}
                     >
-                      <Card className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-sm hover:bg-white h-[520px] flex flex-col">
-                        <div className="relative">
-                          {/* Budget Badge */}
+                      <Card className="group flex flex-col h-full overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-sm hover:bg-white">
+                        <div className="relative w-full h-48 bg-gray-200">
+                          {/* Budget Range Badge (Comparison Hub Style) */}
                           <div className="absolute top-4 left-4 z-10">
-                            <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-3 py-1">
-                              {formatBudgetRange(property)}
-                            </Badge>
+                            <span className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold shadow">
+                              {(() => {
+                                let basePrices: number[] = [];
+                                const configs = property.configurations || (property as any).Configurations;
+                                if (Array.isArray(configs)) {
+                                  configs.forEach((conf: any) => {
+                                    if (typeof conf === 'object' && conf !== null && 'BaseProjectPrice' in conf) {
+                                      const val = Number(conf.BaseProjectPrice);
+                                      if (!isNaN(val)) basePrices.push(val);
+                                    }
+                                  });
+                                }
+                                if (basePrices.length === 0) {
+                                  if (typeof property.minimumBudget === 'number' && !isNaN(property.minimumBudget)) basePrices.push(property.minimumBudget);
+                                  if (typeof property.maximumBudget === 'number' && !isNaN(property.maximumBudget)) basePrices.push(property.maximumBudget);
+                                  if (typeof property.price === 'number' && !isNaN(property.price)) basePrices.push(property.price);
+                                }
+                                if (basePrices.length > 0) {
+                                  const min = Math.min(...basePrices);
+                                  const max = Math.max(...basePrices);
+                                  if (min === max) {
+                                    return `₹${formatINR(min)}`;
+                                  } else {
+                                    return `₹${formatINR(min)} - ₹${formatINR(max)}`;
+                                  }
+                                }
+                                return 'Price not available';
+                              })()}
+                            </span>
                           </div>
-                          
                           {/* Smart Rating */}
                           <div className="absolute top-4 right-4 z-10">
                             <div className="bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
@@ -460,19 +616,13 @@ export default function PropertyResultsNew({ properties, preferences }: Property
                               </span>
                             </div>
                           </div>
-
                           {/* Property Image */}
-                          <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center group-hover:scale-105 transition-transform duration-500 overflow-hidden">
-                            <img
-                              src={
-                                property.images && property.images.length > 0
-                                  ? property.images[0]
-                                  : "http://localhost:5001/property_images/floresta_20patighanpur_0.jpg"
-                              }
-                              alt={property.projectName}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
+                          <img
+                            src={getPropertyImagePath(property)}
+                            alt={property.projectName}
+                            className="w-full h-full object-cover"
+                            onError={e => { (e.target as HTMLImageElement).src = '/img/placeholder-property.png'; }}
+                          />
                         </div>
 
                         <CardContent className="p-6 flex-1 flex flex-col">
@@ -485,6 +635,68 @@ export default function PropertyResultsNew({ properties, preferences }: Property
                               <div className="flex items-center gap-2 text-gray-600">
                                 <MapPin className="h-4 w-4" />
                                 <span className="text-sm">{property.location || property.Area}</span>
+                              </div>
+                              {/* Price per sq ft and Size Range */}
+                              <div className="flex items-center gap-4 mt-2">
+                                {/* Price per sq ft */}
+                                <span className="inline-flex items-center px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-semibold">
+                                  {(() => {
+                                    // Price per sq ft logic (from comparison hub)
+                                    let priceSqftArr: number[] = [];
+                                    const configs = property.configurations || (property as any).Configurations;
+                                    if (Array.isArray(configs)) {
+                                      configs.forEach((conf: any) => {
+                                        if (typeof conf === 'object' && conf !== null) {
+                                          const val = conf.Price_per_sft || conf.price_per_sft || conf.PricePerSqft || conf.pricePerSqft;
+                                          if (typeof val === 'number' && !isNaN(val)) priceSqftArr.push(val);
+                                        }
+                                      });
+                                    }
+                                    if (priceSqftArr.length === 0 && (typeof property.Price_per_sft === 'number' || typeof property.price_per_sft === 'number')) {
+                                      if (typeof property.Price_per_sft === 'number' && !isNaN(property.Price_per_sft)) priceSqftArr.push(property.Price_per_sft);
+                                      if (typeof property.price_per_sft === 'number' && !isNaN(property.price_per_sft)) priceSqftArr.push(property.price_per_sft);
+                                    }
+                                    if (priceSqftArr.length > 0) {
+                                      const min = Math.min(...priceSqftArr);
+                                      const max = Math.max(...priceSqftArr);
+                                      if (min === max) {
+                                        return `₹${formatINR(min)}/sq ft`;
+                                      } else {
+                                        return `₹${formatINR(min)} - ₹${formatINR(max)}/sq ft`;
+                                      }
+                                    }
+                                    return 'Price on Request';
+                                  })()}
+                                </span>
+                                {/* Size Range */}
+                                <span className="inline-flex items-center px-2 py-1 bg-green-50 text-green-700 rounded text-xs font-semibold">
+                                  {(() => {
+                                    let sizes: number[] = [];
+                                    const configs = property.configurations || (property as any).Configurations;
+                                    if (Array.isArray(configs)) {
+                                      configs.forEach((conf: any) => {
+                                        if (typeof conf === 'object' && conf !== null) {
+                                          const size = conf.sizeRange || conf.size || conf.area || conf.Size || conf.superBuiltupArea;
+                                          if (typeof size === 'number' && !isNaN(size)) sizes.push(size);
+                                        }
+                                      });
+                                    }
+                                    if (sizes.length === 0) {
+                                      const fallback = property.minSizeSqft || property.area || (property as any).Size;
+                                      if (typeof fallback === 'number' && !isNaN(fallback)) sizes.push(fallback);
+                                    }
+                                    if (sizes.length > 0) {
+                                      const min = Math.min(...sizes);
+                                      const max = Math.max(...sizes);
+                                      if (min === max) {
+                                        return `${formatINR(min)} sq ft`;
+                                      } else {
+                                        return `${formatINR(min)} - ${formatINR(max)} sq ft`;
+                                      }
+                                    }
+                                    return 'N/A';
+                                  })()}
+                                </span>
                               </div>
                             </div>
 
@@ -549,7 +761,7 @@ export default function PropertyResultsNew({ properties, preferences }: Property
                     </motion.div>
                   );
                 })}
-              </motion.div>
+              </div>
 
               {/* Action Buttons Section */}
               {allProperties.length > 0 && (
@@ -1124,7 +1336,7 @@ export default function PropertyResultsNew({ properties, preferences }: Property
 
       {/* PDF Download Form */}
       <PDFDownloadForm
-        properties={allProperties as any}
+        properties={allProperties.map(normalizePropertyForPDF)}
         isOpen={showPDFForm}
         onClose={() => setShowPDFForm(false)}
       />

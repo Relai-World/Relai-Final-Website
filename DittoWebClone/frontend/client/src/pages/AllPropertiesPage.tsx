@@ -702,44 +702,13 @@ export default function AllPropertiesPage() {
       {viewMode === 'map' && <div className="mb-8 h-[600px]"><PropertiesMap properties={mapProperties} /></div>}
 
       {!isLoading && !error && properties.length > 0 && viewMode === 'list' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {properties.map((property: ApiProperty) => {
-            // Extract property data from Mongoose document structure
             const propertyData = extractPropertyData(property);
-            
-            // --- DEBUGGING LOG ---
-            // This is the most important log to check the fields of EACH property
-            console.log('4. Rendering property card with this data:', {
-              id: propertyData.id || propertyData._id,
-              all_keys: Object.keys(propertyData),
-              ProjectName: propertyData.ProjectName,
-              BuilderName: propertyData.BuilderName,
-              Area: propertyData.Area,
-              Possession_date: propertyData.Possession_date,
-              Price_per_sft: propertyData.Price_per_sft,
-              configurations: propertyData.configurations, // Check this field specifically!
-              configurationDetails: propertyData.configurationDetails, // Check this field specifically!
-              Configurations: propertyData.Configurations, // Check capitalized version
-              configuration: propertyData.configuration, // Check lowercase version
-              Configuration: propertyData.Configuration, // Check capitalized version
-              bhk: propertyData.bhk, // Check BHK field
-              BHK: propertyData.BHK, // Check capitalized BHK
-              bedrooms: propertyData.bedrooms, // Check bedrooms field
-              propertyType: propertyData.propertyType, // Check property type
-              unitType: propertyData.unitType, // Check unit type
-              UnitType: propertyData.UnitType, // Check capitalized unit type
-              images: propertyData.images,
-              // Log any other fields you expect here
-            });
-            
             return (
-              <div 
-                key={propertyData.id || propertyData._id} 
-                className="cursor-pointer group" 
-                onClick={() => handleCardClick(propertyData.id || propertyData._id)}
-              >
-                <Card className="flex flex-col overflow-hidden h-full border-gray-200 group-hover:shadow-xl group-hover:border-blue-300 transition-all duration-300">
-                  <div className="relative w-full h-56 bg-gray-200">
+              <div key={propertyData.id || propertyData._id} className="h-full">
+                <Card className="h-full flex flex-col overflow-hidden border-gray-200 group-hover:shadow-xl group-hover:border-blue-300 transition-all duration-300">
+                  <div className="relative h-48 w-full overflow-hidden bg-gray-200">
                     {propertyData.images && propertyData.images.length > 0 ? (
                       <img 
                         src={`${API_BASE_URL_OTHERS}${propertyData.images[0]}`}
@@ -772,151 +741,55 @@ export default function AllPropertiesPage() {
                        </div>
                     )}
                   </div>
-                  
-                  <CardContent className="p-4 flex flex-col flex-grow">
-                    <h3 className="text-lg font-bold text-gray-800 truncate mb-1">{propertyData.ProjectName || propertyData.projectName || "Unnamed Project"}</h3>
+                  <CardContent className="flex-1 flex flex-col p-4">
+                    <h3 className="text-lg font-bold text-gray-800 truncate mb-1">{(propertyData.ProjectName || propertyData.projectName || "Unnamed Project").toUpperCase()}</h3>
                     <p className="text-sm text-gray-600 mb-1">By {propertyData.BuilderName || "Unknown Builder"}</p>
                     <div className="flex items-center gap-1.5 text-sm text-gray-500 mb-4">
                       <MapPinIcon size={14} />
                       <span>{propertyData.Area || propertyData.Location || propertyData.location || "Location Not Available"}</span>
                     </div>
-
                     <div className="grid grid-cols-3 gap-2 border-t border-b border-gray-100 py-3 mb-auto">
                       <div className="flex flex-col gap-1">
-                          <span className="text-xs text-gray-400 flex items-center gap-1"><Building2 size={12}/>Configuration</span>
-                          <span className="text-sm font-semibold text-gray-700">
-                            {(() => {
-                              // 1. Try direct configurations array (robust check)
-                              let configs = propertyData.configurations;
-                              if (
-                                Array.isArray(configs) &&
-                                configs.length > 0
-                              ) {
-                                // Collect unique types
-                                const configTypesSet = new Set(
-                                  configs
-                                    .map((conf: any) => conf && (conf.type || conf.Type || ''))
-                                    .filter(Boolean)
-                                );
-                                const configTypes = Array.from(configTypesSet);
-                                return configTypes.length > 0 ? configTypes.join(', ') : 'N/A';
-                              } else if (
-                                configs &&
-                                typeof configs === 'object' &&
-                                configs.name === 'ValidatorError'
-                              ) {
-                                // It's an error object, treat as missing
-                                configs = undefined;
-                              }
-                              // 2. Fallback: error object (for broken backend)
-                              configs =
-                                propertyData?.$errors?.configurations?.properties?.value ||
-                                propertyData?.$__?.validationError?.errors?.configurations?.properties?.value;
-                              if (Array.isArray(configs) && configs.length > 0) {
-                                const configTypesSet = new Set(
-                                  configs
-                                    .map((conf: any) => conf && (conf.type || conf.Type || ''))
-                                    .filter(Boolean)
-                                );
-                                const configTypes = Array.from(configTypesSet);
-                                return configTypes.length > 0 ? configTypes.join(', ') : 'N/A';
-                              }
-                              // 3. Fallback: previous logic
-                              let configDetails = propertyData.configurationDetails;
-                              if (typeof configDetails === 'string') {
-                                try {
-                                  configDetails = JSON.parse(configDetails);
-                                } catch (e) {
-                                  // If parsing fails, try other configuration fields
-                                }
-                              }
-                              if (Array.isArray(configDetails) && configDetails.length > 0) {
-                                const configTypesSet = new Set(
-                                  configDetails
-                                    .map((conf: any) =>
-                                      conf && (conf.type || conf.Type || conf.bhkType || conf.bhk || conf.unitType || conf.configurationType || '')
-                                    )
-                                    .filter(Boolean)
-                                );
-                                const configTypes = Array.from(configTypesSet);
-                                return configTypes.length > 0 ? configTypes.join(', ') : 'N/A';
-                              }
-                              const possibleConfigFields = [
-                                propertyData.Configurations,
-                                propertyData.configuration,
-                                propertyData.Configuration,
-                                propertyData.bhk,
-                                propertyData.BHK,
-                                propertyData.unitType,
-                                propertyData.UnitType
-                              ];
-                              const configField = possibleConfigFields.find(field =>
-                                field && typeof field === 'string' && field.trim() !== ''
-                              );
-                              if (configField) {
-                                return configField;
-                              }
-                              if (propertyData.bedrooms) {
-                                return `${propertyData.bedrooms} BHK`;
-                              }
-                              if (propertyData.propertyType) {
-                                const type = propertyData.propertyType.toLowerCase();
-                                if (type.includes('plot')) return 'Plot';
-                                if (type.includes('villa')) return 'Villa';
-                                if (type.includes('apartment')) return 'Apartment';
-                                if (type.includes('house')) return 'House';
-                              }
-                              return 'N/A';
-                            })()}
-                          </span>
+                        <span className="text-xs text-gray-400 flex items-center gap-1"><Building2 size={12}/>Configuration</span>
+                        <span className="text-sm font-semibold text-gray-700">
+                          {(() => {
+                            let configs = propertyData.configurations;
+                            if (Array.isArray(configs) && configs.length > 0) {
+                              const configTypesSet = new Set(configs.map((conf: any) => conf && (conf.type || conf.Type || '')).filter(Boolean));
+                              const configTypes = Array.from(configTypesSet);
+                              return configTypes.length > 0 ? configTypes.join(', ') : 'N/A';
+                            }
+                            let configDetails = propertyData.configurationDetails;
+                            if (typeof configDetails === 'string') {
+                              try { configDetails = JSON.parse(configDetails); } catch (e) {}
+                            }
+                            if (Array.isArray(configDetails) && configDetails.length > 0) {
+                              const configTypesSet = new Set(configDetails.map((conf: any) => conf && (conf.type || conf.Type || conf.bhkType || conf.bhk || conf.unitType || conf.configurationType || '')).filter(Boolean));
+                              const configTypes = Array.from(configTypesSet);
+                              return configTypes.length > 0 ? configTypes.join(', ') : 'N/A';
+                            }
+                            const possibleConfigFields = [propertyData.Configurations, propertyData.configuration, propertyData.Configuration, propertyData.bhk, propertyData.BHK, propertyData.unitType, propertyData.UnitType];
+                            const configField = possibleConfigFields.find(field => field && typeof field === 'string' && field.trim() !== '');
+                            if (configField) return configField;
+                            if (propertyData.bedrooms) return `${propertyData.bedrooms} BHK`;
+                            if (propertyData.propertyType) {
+                              const type = propertyData.propertyType.toLowerCase();
+                              if (type.includes('plot')) return 'Plot';
+                              if (type.includes('villa')) return 'Villa';
+                              if (type.includes('apartment')) return 'Apartment';
+                              if (type.includes('house')) return 'House';
+                            }
+                            return 'N/A';
+                          })()}
+                        </span>
                       </div>
-                       <div className="flex flex-col gap-1">
-                          {/* <span className="text-xs text-gray-400 flex items-center gap-1"><Ruler size={12}/>Area</span> */}
-                          {/* <span className="text-sm font-semibold text-gray-700">
-                            {(() => {
-                              // Use 'configurationDetails' as identified from the logs
-                              let configs = propertyData.configurationDetails;
-                              if (typeof configs === 'string') {
-                                try {
-                                  configs = JSON.parse(configs);
-                                } catch (e) {
-                                  return propertyData.area || propertyData.size || propertyData.sizeRange || propertyData.superBuiltupArea ? `${propertyData.area || propertyData.size || propertyData.sizeRange || propertyData.superBuiltupArea} sq.ft` : 'N/A';
-                                }
-                              }
-                              if (Array.isArray(configs) && configs.length > 0) {
-                                const sizes = configs
-                                  .map((conf: any) =>
-                                    conf.sizeRange || conf.size_range || conf.SizeRange || conf.area || conf.Area || conf.size || conf.Size || conf.superBuiltupArea
-                                  )
-                                  .filter((v: any) => typeof v === 'number' && !isNaN(v));
-                                if (sizes.length === 0) {
-                                  return propertyData.area || propertyData.size || propertyData.sizeRange || propertyData.superBuiltupArea ? `${propertyData.area || propertyData.size || propertyData.sizeRange || propertyData.superBuiltupArea} sq.ft` : 'N/A';
-                                }
-                                const min = Math.min(...sizes);
-                                const max = Math.max(...sizes);
-                                const unit =
-                                  configs[0]?.sizeUnit ||
-                                  configs[0]?.size_unit ||
-                                  configs[0]?.SizeUnit ||
-                                  configs[0]?.unit ||
-                                  configs[0]?.Unit ||
-                                  'sq.ft';
-                                return min !== max ? `${min}-${max} ${unit}` : `${min} ${unit}`;
-                              } else if (propertyData.area || propertyData.size || propertyData.sizeRange || propertyData.superBuiltupArea) {
-                                return `${propertyData.area || propertyData.size || propertyData.sizeRange || propertyData.superBuiltupArea} sq.ft`;
-                              }
-                              return 'N/A';
-                            })()}
-                          </span> */}
-                      </div>
-                       <div className="flex flex-col gap-1">
-                          <span className="text-xs text-gray-400 flex items-center gap-1"><CalendarIcon size={12}/>Possession</span>
-                          <span className="text-sm font-semibold text-gray-700">{formatPossessionDate(propertyData.Possession_date)}</span>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs text-gray-400 flex items-center gap-1"><CalendarIcon size={12}/>Possession</span>
+                        <span className="text-sm font-semibold text-gray-700">{formatPossessionDate(propertyData.Possession_date)}</span>
                       </div>
                     </div>
                   </CardContent>
-                  
-                  <CardFooter className="px-4 pt-3 pb-4">
+                  <CardFooter className="px-4 pt-3 pb-4 bg-gray-50 border-t mt-auto">
                     <div className="flex justify-between items-end w-full">
                       <div className="text-left">
                         <p className="text-xs text-gray-500">Price Per Sq.ft</p>

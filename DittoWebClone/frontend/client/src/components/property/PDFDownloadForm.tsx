@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { normalizePropertyForPDF } from './PropertyResultsNew';
 
 // Extend jsPDF type to include autoTable
 declare module 'jspdf' {
@@ -98,6 +99,68 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
     }
     return "Price on Request";
   };
+
+  // Helper to extract price range and size range for PDF (same as property cards)
+  function getPriceRangeForPDF(property: any): string {
+    let basePrices: number[] = [];
+    const configs = property.configurations || property.Configurations;
+    if (Array.isArray(configs)) {
+      configs.forEach((conf: any) => {
+        if (typeof conf === 'object' && conf !== null && 'BaseProjectPrice' in conf) {
+          let val = conf.BaseProjectPrice;
+          if (typeof val === 'string') val = Number(val.replace(/[^\d.]/g, ''));
+          if (typeof val === 'number' && !isNaN(val)) basePrices.push(val);
+        }
+      });
+    }
+    if (basePrices.length === 0) {
+      if (typeof property.minimumBudget === 'string') property.minimumBudget = Number(property.minimumBudget.replace(/[^\d.]/g, ''));
+      if (typeof property.maximumBudget === 'string') property.maximumBudget = Number(property.maximumBudget.replace(/[^\d.]/g, ''));
+      if (typeof property.price === 'string') property.price = Number(property.price.replace(/[^\d.]/g, ''));
+      if (typeof property.minimumBudget === 'number' && !isNaN(property.minimumBudget)) basePrices.push(property.minimumBudget);
+      if (typeof property.maximumBudget === 'number' && !isNaN(property.maximumBudget)) basePrices.push(property.maximumBudget);
+      if (typeof property.price === 'number' && !isNaN(property.price)) basePrices.push(property.price);
+    }
+    if (basePrices.length > 0) {
+      const min = Math.min(...basePrices);
+      const max = Math.max(...basePrices);
+      if (min === max) {
+        return `₹${min.toLocaleString()}`;
+      } else {
+        return `₹${min.toLocaleString()} - ₹${max.toLocaleString()}`;
+      }
+    }
+    return 'Price not available';
+  }
+
+  function getSizeRangeForPDF(property: any): string {
+    let sizes: number[] = [];
+    const configs = property.configurations || property.Configurations;
+    if (Array.isArray(configs)) {
+      configs.forEach((conf: any) => {
+        if (typeof conf === 'object' && conf !== null) {
+          let size = conf.sizeRange || conf.size || conf.area || conf.Size || conf.superBuiltupArea;
+          if (typeof size === 'string') size = Number(size.replace(/[^\d.]/g, ''));
+          if (typeof size === 'number' && !isNaN(size)) sizes.push(size);
+        }
+      });
+    }
+    if (sizes.length === 0) {
+      let fallback = property.minSizeSqft || property.area || property.Size;
+      if (typeof fallback === 'string') fallback = Number(fallback.replace(/[^\d.]/g, ''));
+      if (typeof fallback === 'number' && !isNaN(fallback)) sizes.push(fallback);
+    }
+    if (sizes.length > 0) {
+      const min = Math.min(...sizes);
+      const max = Math.max(...sizes);
+      if (min === max) {
+        return `${min} sq ft`;
+      } else {
+        return `${min} - ${max} sq ft`;
+      }
+    }
+    return 'N/A';
+  }
 
   // Professional header and footer function with proper spacing
   const addHeaderFooter = (doc: jsPDF, pageNumber: number, totalPages: number) => {
@@ -381,6 +444,9 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
       let currentPropertyIndex = 0;
       const maxPropertiesPerDetailPage = 3;
 
+      // Normalize all properties using the same logic as property cards
+      const normalizedProperties = properties.map((p: any) => normalizePropertyForPDF(p));
+
       while (currentPropertyIndex < properties.length) {
         doc.addPage();
         pageNumber++;
@@ -424,9 +490,8 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
             ['Location:', property.location || 'N/A'],
             ['Property Type:', property.propertyType || 'N/A'],
             ['Configurations:', property.configurations || 'N/A'],
-            ['Price Range:', formatBudgetRange(property)],
-            ['Size Range:', property.minSizeSqft && property.maxSizeSqft ? 
-              `${property.minSizeSqft} - ${property.maxSizeSqft} sq ft` : 'Contact for details'],
+            ['Price Range:', property.priceRange || 'Price not available'],
+            ['Size Range:', property.sizeRange || 'N/A'],
             ['RERA Number:', property.reraNumber || 'N/A'],
             ['Total Units:', property.totalUnits ? property.totalUnits.toString() : 'N/A'],
             ['Possession:', property.possessionDate || property.possession || 'N/A']

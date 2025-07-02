@@ -47,6 +47,36 @@ const steps = [
   { id: "results", label: "Matching Properties", icon: Home },
 ];
 
+// Helper function to extract property data from Mongoose document structure
+const extractPropertyData = (property: any): any => {
+  if (property && property._doc) {
+    return { ...property._doc, id: property.id || property._id };
+  }
+  return property;
+};
+
+// Helper to parse Possession_date (supports 'DD-MM-YYYY', 'MM-YYYY', 'MM-YY') to a comparable (year, month) tuple
+function parsePossessionDateParts(dateStr: string): [number, number] | null {
+  if (!dateStr) return null;
+  let parts = dateStr.split('-');
+  if (parts.length < 2) return null;
+  let month: number, year: number;
+  if (parts.length === 3) {
+    month = parseInt(parts[1], 10);
+    year = parts[2].length === 2 ? 2000 + parseInt(parts[2], 10) : parseInt(parts[2], 10);
+  } else {
+    month = parseInt(parts[0], 10);
+    year = parts[1].length === 2 ? 2000 + parseInt(parts[1], 10) : parseInt(parts[1], 10);
+  }
+  if (isNaN(month) || isNaN(year)) return null;
+  return [year, month];
+}
+
+function compareYM(a: [number, number], b: [number, number]) {
+  if (a[0] !== b[0]) return a[0] - b[0];
+  return a[1] - b[1];
+}
+
 export default function PropertyWizardPage() {
   // Set page title and meta description when component mounts
   useEffect(() => {
@@ -92,50 +122,109 @@ export default function PropertyWizardPage() {
     appointmentTime: "",
   });
 
-  // Fetch properties based on user preferences when showing results
-  const { data: propertiesData, isLoading: isLoadingProperties } = useQuery({
-    queryKey: ['/api/properties', propertyPreference, currentStep],
+  // Fetch all properties for filtering (not just filtered from backend)
+  const { data: allPropertiesData, isLoading: isLoadingAllProperties } = useQuery({
+    queryKey: ["/api/all-properties-wizard"],
     queryFn: async () => {
-      if (currentStep !== 'results' || (!propertyPreference.minBudget && !propertyPreference.maxBudget)) {
-        return { properties: [], total: 0 };
-      }
-
-      console.log('Fetching properties with preferences:', propertyPreference);
-      
-      // Build query parameters for the new API endpoint
-      const params = new URLSearchParams();
-      // Append in the correct order
-      if (propertyPreference.locations?.length) {
-        params.append('location', propertyPreference.locations.join(','));
-      }
-      if (propertyPreference.minBudget || propertyPreference.maxBudget) {
-        const baseProjectPrice = propertyPreference.minBudget || propertyPreference.maxBudget;
-        if (baseProjectPrice !== undefined) {
-          params.append('baseProjectPrice', baseProjectPrice.toString());
-        }
-      }
-      if (propertyPreference.configuration) {
-        params.append('configurations', propertyPreference.configuration);
-      }
-      if (propertyPreference.possession) {
-        params.append('Possession_date', propertyPreference.possession);
-      }
-
-      const queryString = params.toString().replace(/\+/g, '%20');
-      console.log('API Request URL params:', queryString);
-
-      const response = await fetch(`http://localhost:5001/api/wizard-properties?${queryString}`);
-      console.log('API Response:', response);
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch properties');
-      }
-
+      const response = await fetch("http://localhost:5001/api/all-properties");
+      if (!response.ok) throw new Error("Failed to fetch all properties");
       const data = await response.json();
-      console.log('Properties fetched:', data.total);
-      return data;
+      return data.properties || [];
     },
-    enabled: currentStep === 'results'
+    enabled: currentStep === "results"
+  });
+
+  // Filtering logic (copied from AllPropertiesPage)
+  const filteredProperties = (allPropertiesData || []).filter((property: any) => {
+    const propertyData = extractPropertyData(property);
+    // Location filter
+    if (propertyPreference.locations && propertyPreference.locations.length > 0) {
+      const matchesLocation = propertyPreference.locations.some(loc =>
+        propertyData.Location === loc ||
+        propertyData.location === loc ||
+        propertyData.Area === loc
+      );
+      if (!matchesLocation) return false;
+    }
+    // Possession Timeline filter
+    if (propertyPreference.possession && propertyPreference.possession !== 'any') {
+      const today = new Date();
+      const currentMonth = today.getMonth() + 1;
+      const currentYear = today.getFullYear();
+      let minYM: [number, number] | null = null;
+      let maxYM: [number, number] | null = null;
+      if (propertyPreference.possession === 'ready') {
+        maxYM = [currentYear, currentMonth];
+      } else if (propertyPreference.possession === '2plus') {
+        let future = new Date(currentYear, currentMonth - 1 + 24, 1);
+        minYM = [future.getFullYear(), future.getMonth() + 1];
+      } else if (propertyPreference.possession === '3-6') {
+        let minDate = new Date(currentYear, currentMonth - 1 + 3, 1);
+        let maxDate = new Date(currentYear, currentMonth - 1 + 6, 1);
+        minYM = [minDate.getFullYear(), minDate.getMonth() + 1];
+        maxYM = [maxDate.getFullYear(), maxDate.getMonth() + 1];
+      } else if (propertyPreference.possession === '6-12') {
+        let minDate = new Date(currentYear, currentMonth - 1 + 6, 1);
+        let maxDate = new Date(currentYear, currentMonth - 1 + 12, 1);
+        minYM = [minDate.getFullYear(), minDate.getMonth() + 1];
+        maxYM = [maxDate.getFullYear(), maxDate.getMonth() + 1];
+      } else if (propertyPreference.possession === '1-2') {
+        let minDate = new Date(currentYear, currentMonth - 1 + 12, 1);
+        let maxDate = new Date(currentYear, currentMonth - 1 + 24, 1);
+        minYM = [minDate.getFullYear(), minDate.getMonth() + 1];
+        maxYM = [maxDate.getFullYear(), maxDate.getMonth() + 1];
+      }
+      const possessionStr = propertyData.Possession_date || propertyData.possessionTimeline || '';
+      const possessionYM = parsePossessionDateParts(possessionStr);
+      if (!possessionYM) return false;
+      if (propertyPreference.possession === 'ready') {
+        if (compareYM(possessionYM, maxYM!) > 0) return false;
+      } else if (propertyPreference.possession === '2plus') {
+        if (compareYM(possessionYM, minYM!) <= 0) return false;
+      } else if (minYM && maxYM) {
+        if (compareYM(possessionYM, minYM) < 0 || compareYM(possessionYM, maxYM) > 0) return false;
+      }
+    }
+    // Budget Range filter
+    if (propertyPreference.budget && propertyPreference.budget !== 'any') {
+      // Try to get all base budgets from configurations
+      let baseBudgets: number[] = [];
+      if (Array.isArray(propertyData.configurations)) {
+        baseBudgets = propertyData.configurations
+          .map((conf: any) => conf?.BaseProjectPrice)
+          .filter((v: any) => typeof v === 'number');
+      }
+      // Fallback to minimumBudget or price if no configurations
+      if (baseBudgets.length === 0) {
+        const fallbackBudget = propertyData.minimumBudget || propertyData.price || 0;
+        baseBudgets = [fallbackBudget];
+      }
+      let inRange = false;
+      switch (propertyPreference.budget) {
+        case 'under50':
+          inRange = baseBudgets.some(budget => budget > 0 && budget <= 5000000);
+          break;
+        case 'above200':
+          inRange = baseBudgets.some(budget => budget >= 20000000);
+          break;
+        case '50to75':
+          inRange = baseBudgets.some(budget => budget > 0 && budget <= 7500000);
+          break;
+        case '75to100':
+          inRange = baseBudgets.some(budget => budget > 0 && budget <= 10000000);
+          break;
+        case '100to150':
+          inRange = baseBudgets.some(budget => budget > 0 && budget <= 15000000);
+          break;
+        case '150to200':
+          inRange = baseBudgets.some(budget => budget > 0 && budget <= 20000000);
+          break;
+        default:
+          inRange = true;
+      }
+      if (!inRange) return false;
+    }
+    return true;
   });
 
   // Handler functions for form submissions
@@ -724,7 +813,7 @@ export default function PropertyWizardPage() {
               transition={{ duration: 0.3 }}
               className="w-full"
             >
-              {isLoadingProperties ? (
+              {isLoadingAllProperties ? (
                 <div className="text-center py-12">
                   <Loader2 className="w-8 h-8 mx-auto mb-4 text-blue-600 animate-spin" />
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">Finding Perfect Properties</h3>
@@ -732,7 +821,7 @@ export default function PropertyWizardPage() {
                 </div>
               ) : (
                 <PropertyResultsNew 
-                  properties={propertiesData?.properties || []} 
+                  properties={filteredProperties} 
                   preferences={propertyPreference} 
                 />
               )}
