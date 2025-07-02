@@ -700,7 +700,7 @@ export default function LoanCalculatorPage() {
                   on the best loan options for your budget and property choice.
                 </p>
 
-                <Button className="w-full bg-[#1752FF] hover:bg-[#103cc9]" onClick={() => navigate("/contact")}>
+                <Button className="w-full bg-[#1752FF] hover:bg-[#103cc9]" onClick={() => navigate("/contact-us")}>
                   Connect with a Loan Expert{" "}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -853,7 +853,7 @@ export default function LoanCalculatorPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button className="bg-white text-[#1752FF] hover:bg-gray-100"
-                onClick={() => navigate("/contact")}
+                onClick={() => navigate("/contact-us")}
                 >
                 Connect with a Loan Expert
               </Button>

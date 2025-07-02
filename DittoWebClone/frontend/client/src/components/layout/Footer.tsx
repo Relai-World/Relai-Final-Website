@@ -103,7 +103,7 @@ export default function Footer() {
         
         <div className="mt-12 pt-8 border-t border-gray-700">
           <div className="flex flex-col md:flex-row justify-center items-center gap-4 mb-4">
-            <ScrollToTopLink href="/terms" className="text-gray-300 hover:text-[#1752FF] transition text-sm">
+            <ScrollToTopLink href="/terms-and-conditions" className="text-gray-300 hover:text-[#1752FF] transition text-sm">
               Terms and Conditions
             </ScrollToTopLink>
             <span className="hidden md:inline text-gray-500">|</span>

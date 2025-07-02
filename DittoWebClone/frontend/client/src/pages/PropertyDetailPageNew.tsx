@@ -25,6 +25,7 @@ import {
   Scale
 } from 'lucide-react';
 import { geocodeAddress } from '@/utils/geocode';
+import { useToast } from '@/hooks/use-toast';
 
 // UI components
 import Container from '@/components/ui/container';
@@ -61,6 +62,7 @@ export default function PropertyDetailPageNew() {
   const [validImages, setValidImages] = useState<string[]>([]);
   
   const queryClient = useQueryClient();
+  const { toast } = useToast ? useToast() : { toast: undefined };
   
   // Fetch property data from API
   const { data, isLoading, error } = useQuery({
@@ -318,6 +320,28 @@ export default function PropertyDetailPageNew() {
 
   const unitTypes = Array.isArray(configurations) ? configurations.map((c: any) => c.type).join(", ") : "N/A";
 
+  // Share handler
+  const handleShare = () => {
+    const shareUrl = window.location.href;
+    const shareTitle = (property as any).ProjectName || property.projectName || property.name || 'Property on Relai';
+    const shareText = `Check out this property: ${shareTitle}`;
+    if (navigator.share) {
+      navigator.share({
+        title: shareTitle,
+        text: shareText,
+        url: shareUrl,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        if (toast) {
+          toast({ title: 'Link copied!', description: 'Property link copied to clipboard.' });
+        } else {
+          alert('Property link copied to clipboard!');
+        }
+      });
+    }
+  };
+
   return (
     <div className="bg-white pb-0">
       {/* Main Content - Add top padding to clear navigation header */}
@@ -426,10 +450,16 @@ export default function PropertyDetailPageNew() {
                         : 'N/A'}
                     </p>
                   </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Possession</p>
+                    <p className="text-lg font-bold text-blue-900">
+                      {(property as any)["Possession_date"] || property.possessionDate || 'N/A'}
+                    </p>
+                  </div>
                 </div>
               </Card>
-              {/* Specs & Pricing (Merged) */}
-              <Card className="overflow-hidden">
+              {/* Specs & Pricing (Merged) - now full width */}
+              <Card className="overflow-hidden md:col-span-2 w-full">
                 <div className="bg-blue-600 p-3">
                   <h3 className="text-white font-medium flex items-center">
                     <Home className="w-4 h-4 mr-2" />
@@ -437,38 +467,40 @@ export default function PropertyDetailPageNew() {
                   </h3>
                 </div>
                 <div className="p-4 space-y-6">
-                  <div>
-                    <span>Configuration</span>
+                  <div className="flex gap-2 items-center text-base font-semibold mb-2">
+                    <span>Configuration:</span>
                     <span>{unitType}</span>
                   </div>
-                  <table className="w-full border rounded-lg">
-                    <thead>
-                      <tr className="bg-gray-50 border-b">
-                        <th className="text-left p-3 font-semibold">Unit Type</th>
-                        <th className="text-left p-3 font-semibold">Size</th>
-                        <th className="text-left p-3 font-semibold">Facing</th>
-                        <th className="text-left p-3 font-semibold">Price*</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {configurations.map((config: any, idx: number) => (
-                        <tr key={idx} className="border-b last:border-0">
-                          <td className="p-3 font-medium">
-                            {config.type}
-                          </td>
-                          <td className="p-3 font-medium">
-                            {config.sizeRange} {config.sizeUnit || 'Sq ft'}
-                          </td>
-                          <td className="p-3 font-medium text-gray-600">
-                            {config.facing || 'N/A'}
-                          </td>
-                          <td className="p-3 font-bold text-blue-900">
-                            {formatPrice(config.BaseProjectPrice)}
-                          </td>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full w-full border rounded-lg">
+                      <thead>
+                        <tr className="bg-gray-50 border-b">
+                          <th className="text-left px-6 py-4 font-semibold text-base">Unit Type</th>
+                          <th className="text-left px-6 py-4 font-semibold text-base">Size</th>
+                          <th className="text-left px-6 py-4 font-semibold text-base">Facing</th>
+                          <th className="text-left px-6 py-4 font-semibold text-base">Price*</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {configurations.map((config: any, idx: number) => (
+                          <tr key={idx} className="border-b last:border-0">
+                            <td className="px-6 py-4 font-medium text-base">
+                              {config.type}
+                            </td>
+                            <td className="px-6 py-4 font-medium text-base">
+                              {config.sizeRange} {config.sizeUnit || 'Sq ft'}
+                            </td>
+                            <td className="px-6 py-4 font-medium text-base text-gray-600">
+                              {config.facing || 'N/A'}
+                            </td>
+                            <td className="px-6 py-4 font-bold text-blue-900 text-base">
+                              {formatPrice(config.BaseProjectPrice)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                   {/* Pricing Details (below table) */}
                   {(() => {
                     const { minPrice, maxPrice } = getPriceRange();
@@ -508,7 +540,7 @@ export default function PropertyDetailPageNew() {
                 </div>
               </Card>
               {/* Status & Timeline */}
-              <Card className="overflow-hidden flex items-center justify-center min-h-[180px]">
+              {/* <Card className="overflow-hidden flex items-center justify-center min-h-[180px]">
                 <div className="w-full text-center py-8">
                   <div className="flex flex-col items-center justify-center">
                     <Clock className="w-8 h-8 text-blue-600 mb-2" />
@@ -518,7 +550,7 @@ export default function PropertyDetailPageNew() {
                     </p>
                   </div>
                 </div>
-              </Card>
+              </Card> */}
             </div>
             {/* Description */}
             {property.description && (
@@ -643,7 +675,7 @@ export default function PropertyDetailPageNew() {
                     <MessageSquare className="mr-2 h-4 w-4" /> Contact Property Expert
                   </Button>
                   <div className="flex justify-between gap-2">
-                    <Button variant="outline" className="flex-1 flex items-center justify-center gap-2">
+                    <Button variant="outline" className="flex-1 flex items-center justify-center gap-2" onClick={handleShare}>
                       <Share2 className="h-4 w-4" /> Share
                     </Button>
                     <Button variant="outline" className="flex-1 flex items-center justify-center gap-2">
@@ -652,7 +684,7 @@ export default function PropertyDetailPageNew() {
                     <Button 
                       variant="outline" 
                       className="flex-1 flex items-center justify-center gap-2 border-blue-200 text-blue-600 hover:bg-blue-50"
-                      onClick={() => navigate(`/compare?property=${property.id}`)}
+                      onClick={() => navigate(`/compare-properties`)}
                     >
                       <Scale className="h-4 w-4" /> Compare
                     </Button>
@@ -681,7 +713,7 @@ export default function PropertyDetailPageNew() {
                   </li>
                 </ul>
                 <div className="mt-4 text-center">
-                  <Button variant="link" className="text-blue-600">View All Benefits</Button>
+                  <Button variant="link" className="text-blue-600" onClick={() => navigate("/benefits")} >View All Benefits</Button>
                 </div>
               </Card>
               {/* Additional Info Cards */}

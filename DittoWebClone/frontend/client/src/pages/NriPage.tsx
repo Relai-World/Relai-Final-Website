@@ -83,7 +83,7 @@ export default function NriPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/contact" className="w-full sm:w-auto">
+            <Link href="/contact-us" className="w-full sm:w-auto">
               <Button
                 size="lg"
                 className="bg-[#1752FF] hover:bg-[#103cc9] w-full"
@@ -914,7 +914,7 @@ export default function NriPage() {
               goals and explore premium property options.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/contact" className="w-full sm:w-auto">
+              <Link href="/contact-us" className="w-full sm:w-auto">
                 <Button className="bg-white text-[#1752FF] hover:bg-gray-100 flex items-center justify-center w-full">
                   <Phone className="mr-2 h-4 w-4" />
                   Schedule a Free Consultation
@@ -922,7 +922,8 @@ export default function NriPage() {
               </Link>
               <WhatsAppButton
                 fixed={false}
-                className="text-white border-white bg-transparent hover:bg-white/20 w-full sm:w-auto"
+                
+                className="bg-white text-[#1752FF] hover:bg-gray-100 w-full sm:w-auto"
               >
                 Contact on WhatsApp
               </WhatsAppButton>

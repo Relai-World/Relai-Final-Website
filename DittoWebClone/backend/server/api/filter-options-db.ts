@@ -45,8 +45,10 @@ export async function getFilterOptionsHandler(req: Request, res: Response) {
     
     // Query for unique locations
     const locationsData = await Property.distinct('Area');
+    console.log('LOCATIONS FROM DB:', locationsData);
     console.log('Locations data:', locationsData);
     const locations = locationsData.filter(Boolean);
+    console.log('CLEANED LOCATIONS:', locations); 
     console.log('Locations:', locations);
     
     // Static possession options

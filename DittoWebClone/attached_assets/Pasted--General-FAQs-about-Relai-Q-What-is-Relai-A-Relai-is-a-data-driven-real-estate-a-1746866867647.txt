@@ -117,7 +117,7 @@
 
 **Q: How do I know Relai is unbiased?**
 
-**A:** We don’t push projects. We recommend only those that match your needs and pass our internal quality filters. Our advisors are not incentivized per project—they’re incentivized by your satisfaction.
+**A:** We don’t push projects. We recommend only those that match your needs and pass our internal quality . Our advisors are not incentivized per project—they’re incentivized by your satisfaction.
 
 **Q: What if I don’t like the suggested projects?**
 
