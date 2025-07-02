@@ -1,4 +1,4 @@
-  [
+[
   {
     "location": "attapur",
     "lat": 17.3767325,
@@ -3808,5 +3808,10 @@
     "location": "LaCasa 1, Hyderabad",
     "lat": 17.4223288,
     "lng": 78.4461054
+  },
+  {
+    "location": "Thimu Kings Court Block C, Hyderabad",
+    "lat": 17.554187,
+    "lng": 78.468913
   }
 ]
