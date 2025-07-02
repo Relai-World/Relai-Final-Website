@@ -5886,5 +5886,288 @@
         }
       ]
     }
+  },
+  "17.5542,78.4689": {
+    "timestamp": 1751442633798,
+    "data": {
+      "amenities": [
+        {
+          "type": "Hospitals",
+          "count": 7,
+          "places": [
+            {
+              "name": "AAYURDHARA HOSPITAL",
+              "distance": "1.8 km",
+              "duration": "6 mins",
+              "rating": 5
+            },
+            {
+              "name": "Pulse Care Clinic",
+              "distance": "4.6 km",
+              "duration": "15 mins",
+              "rating": 4.1
+            },
+            {
+              "name": "SIREESHA PAEDIATRIC& SPECIALITY CLINICS | Dr.Sireesha Patibandla, MD Paediatrics | Associate Professor",
+              "distance": "5.1 km",
+              "duration": "13 mins",
+              "rating": 5
+            },
+            {
+              "name": "Aditi women's clinic",
+              "distance": "5.2 km",
+              "duration": "13 mins",
+              "rating": 5
+            },
+            {
+              "name": "Aashvi ENT Hospital",
+              "distance": "6.2 km",
+              "duration": "19 mins",
+              "rating": 4.9
+            },
+            {
+              "name": "Sai Siddhartha Hospital",
+              "distance": "6.6 km",
+              "duration": "21 mins",
+              "rating": 4.1
+            },
+            {
+              "name": "Harsha Hospitals - General Plastic Surgery | Cosmetic Surgery | Best Plastic Surgery Hospital in Kompally",
+              "distance": "7.9 km",
+              "duration": "18 mins",
+              "rating": 4.2
+            }
+          ]
+        },
+        {
+          "type": "Shopping Malls",
+          "count": 0,
+          "places": []
+        },
+        {
+          "type": "Schools",
+          "count": 3,
+          "places": [
+            {
+              "name": "VEDAS Exclusive Pre School and After School",
+              "distance": "1.8 km",
+              "duration": "7 mins",
+              "rating": 4.5
+            },
+            {
+              "name": "3rd EYE Academy for Financial Studies",
+              "distance": "5.4 km",
+              "duration": "18 mins",
+              "rating": 5
+            },
+            {
+              "name": "Smartkidz Play School - Preschool",
+              "distance": "6.3 km",
+              "duration": "17 mins",
+              "rating": 4.6
+            }
+          ]
+        },
+        {
+          "type": "Restaurants",
+          "count": 3,
+          "places": [
+            {
+              "name": "Sri Ganesh mithai bhandar",
+              "distance": "1.2 km",
+              "duration": "6 mins",
+              "rating": 4.3
+            },
+            {
+              "name": "Sai Ram Tiffin Center",
+              "distance": "4.7 km",
+              "duration": "12 mins",
+              "rating": 4
+            },
+            {
+              "name": "Thinespo Multicuisine Restaurant",
+              "distance": "10.3 km",
+              "duration": "23 mins",
+              "rating": 4.2
+            }
+          ]
+        },
+        {
+          "type": "Supermarkets",
+          "count": 2,
+          "places": [
+            {
+              "name": "SL Veggies",
+              "distance": "3.6 km",
+              "duration": "12 mins",
+              "rating": 4.5
+            },
+            {
+              "name": "Vijetha supermarket - Cineplanet",
+              "distance": "5.2 km",
+              "duration": "16 mins",
+              "rating": 4.2
+            }
+          ]
+        },
+        {
+          "type": "IT Companies",
+          "count": 0,
+          "places": []
+        }
+      ],
+      "transitPoints": [
+        {
+          "name": "KPHB Colony",
+          "distance": "12.8 km",
+          "duration": "38 mins",
+          "type": "metro"
+        },
+        {
+          "name": "ORR Exit 4A",
+          "distance": "13.1 km",
+          "duration": "31 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Mallampet 4A Entry",
+          "distance": "13.4 km",
+          "duration": "32 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Kukatpally",
+          "distance": "13.6 km",
+          "duration": "39 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Bharat Nagar",
+          "distance": "14.1 km",
+          "duration": "37 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Moosapet",
+          "distance": "14.8 km",
+          "duration": "36 mins",
+          "type": "metro"
+        },
+        {
+          "name": "Miyapur",
+          "distance": "16.1 km",
+          "duration": "45 mins",
+          "type": "metro"
+        },
+        {
+          "name": "ORR plaza",
+          "distance": "16.8 km",
+          "duration": "33 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Exit Number 4",
+          "distance": "23.2 km",
+          "duration": "37 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Narsingi Entry Toll Gate - 18A",
+          "distance": "29.8 km",
+          "duration": "1 hour 8 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Nehru ORR Exit - 1 (towards Vattinagulapally)",
+          "distance": "30.5 km",
+          "duration": "1 hour 6 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Kokapet Toll Plaza",
+          "distance": "30.6 km",
+          "duration": "1 hour 6 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Entry 8 outside",
+          "distance": "31.8 km",
+          "duration": "40 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Outer Ring Road Toll Booth Exit 3",
+          "distance": "32.5 km",
+          "duration": "45 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Hyderabad East",
+          "distance": "40.6 km",
+          "duration": "45 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Ghatkesar Toll Plaza (ORR)",
+          "distance": "41.0 km",
+          "duration": "46 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Exit No 10 Taramatipet",
+          "distance": "48.7 km",
+          "duration": "53 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Nehru ORR Exit - 1 (Financial district)",
+          "distance": "52.2 km",
+          "duration": "1 hour 0 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Exit Toll Booth at TSPA",
+          "distance": "60.3 km",
+          "duration": "1 hour 7 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Nehru ORR Exit - 18 (towards bandlaguda)",
+          "distance": "60.3 km",
+          "duration": "1 hour 7 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Ring Road Interchange",
+          "distance": "60.8 km",
+          "duration": "1 hour 8 mins",
+          "type": "highway"
+        },
+        {
+          "name": "Nehru ORR Entry - 18 (towards gachibowli)",
+          "distance": "61.2 km",
+          "duration": "1 hour 9 mins",
+          "type": "highway"
+        },
+        {
+          "name": "TGPA Junction ORR Entry 18 Tollbooth",
+          "distance": "61.4 km",
+          "duration": "1 hour 10 mins",
+          "type": "highway"
+        },
+        {
+          "name": "ORR Narsingi Exit Toll Gate - 18A",
+          "distance": "65.0 km",
+          "duration": "1 hour 13 mins",
+          "type": "highway"
+        },
+        {
+          "name": "TSPA EXIT TOLL PLAZA, EXIT NO 18",
+          "distance": "67.6 km",
+          "duration": "1 hour 15 mins",
+          "type": "highway"
+        }
+      ]
+    }
   }
 }

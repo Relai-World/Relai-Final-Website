@@ -41,8 +41,8 @@ interface PropertyData {
   builder?: string | null;
   reraNumber?: string | null;
   totalUnits?: number | null;
-  amenities?: string[] | null;
-  features?: string[] | null;
+  amenities?: any[] | null; // Changed to any[] for robustness
+  features?: any[] | null;  // Changed to any[] for robustness
   description?: string | null;
   remarksComments?: string | null;
   [key: string]: any;
@@ -63,6 +63,8 @@ interface PDFDownloadFormProps {
 }
 
 export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDownloadFormProps) {
+  // Normalize incoming properties
+  const normalizedProperties = properties.map(mapPropertyData);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
@@ -154,10 +156,65 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
     doc.setTextColor(0, 0, 0);
   };
 
+  const safeToString = (val: any): string => {
+    if (val === null || val === undefined) return 'N/A';
+    if (typeof val === 'string') return val.trim();
+    if (typeof val === 'number') return val.toString();
+    if (typeof val === 'boolean') return val ? 'Yes' : 'No';
+
+    if (Array.isArray(val)) {
+      if (val.length === 0) return 'N/A';
+      // If array of objects, try to extract a display property
+      if (val.every(item => typeof item === 'object' && item !== null)) {
+        // Try to get 'name', 'label', or first string property
+        return val.map(item => {
+          if (typeof item === 'string') return item;
+          if (item.name) return String(item.name);
+          if (item.label) return String(item.label);
+          // Try to find any string property
+          for (const key in item) {
+            if (typeof item[key] === 'string') return item[key];
+          }
+          // Fallback to JSON
+          try {
+            return JSON.stringify(item);
+          } catch {
+            return '';
+          }
+        }).filter(Boolean).join(', ') || 'N/A';
+      }
+      // If array of primitives
+      return val.map(safeToString).filter(Boolean).join(', ') || 'N/A';
+    }
+
+    if (typeof val === 'object') {
+      if (val.name && typeof val.name === 'string') return val.name.trim();
+      if (val.label && typeof val.label === 'string') return val.label.trim();
+      // Try to find any string property
+      for (const key in val) {
+        if (typeof val[key] === 'string') return val[key];
+      }
+      try {
+        const jsonStr = JSON.stringify(val);
+        if (jsonStr !== '{}') {
+          return jsonStr.length > 75 ? jsonStr.substring(0, 72) + '...}' : jsonStr;
+        }
+      } catch (e) { /* ignore circular refs */ }
+      return 'Details available on request';
+    }
+
+    try {
+      return String(val).trim();
+    } catch {
+      return 'N/A';
+    }
+  };
+
   const generatePDF = async (userData: CredentialFormData) => {
     setIsGenerating(true);
     
     try {
+      console.log('Properties passed to PDFDownloadForm:', normalizedProperties);
       const doc = new jsPDF('p', 'mm', 'a4');
       
       const pageWidth = doc.internal.pageSize.width;
@@ -166,18 +223,15 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
       const headerHeight = 30;
       const footerHeight = 30;
       const contentWidth = pageWidth - (2 * margin);
-      const contentHeight = pageHeight - headerHeight - footerHeight;
       const maxContentY = pageHeight - footerHeight - 10; // 10mm buffer above footer
       let yPosition = headerHeight + 15; // Start below header with buffer
       let pageNumber = 1;
       
-      // We'll calculate total pages dynamically and update footers at the end
-      let totalPages = 0; // Will be calculated after all pages are generated
+      let totalPages = 0;
       
-      // Add placeholder header and footer to first page (will be updated later)
       addHeaderFooter(doc, pageNumber, 1);
 
-      // TITLE PAGE
+      // --- TITLE PAGE ---
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(24);
       doc.setFont('helvetica', 'bold');
@@ -187,7 +241,6 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
       
       yPosition += 40;
       
-      // Subtitle
       doc.setFontSize(16);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(23, 82, 255);
@@ -197,11 +250,9 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
       
       yPosition += 40;
       
-      // Client Information Box
       doc.setDrawColor(23, 82, 255);
       doc.setLineWidth(1);
       doc.rect(margin, yPosition, contentWidth, 50);
-      
       doc.setFillColor(248, 249, 250);
       doc.rect(margin + 1, yPosition + 1, contentWidth - 2, 48, 'F');
       
@@ -218,21 +269,14 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
       
       yPosition += 70;
       
-      // Report Generation Date
       doc.setFontSize(12);
       doc.setTextColor(100, 100, 100);
-      const reportDate = `Report Generated: ${new Date().toLocaleDateString('en-IN', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })}`;
+      const reportDate = `Report Generated: ${new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
       const dateWidth = doc.getTextWidth(reportDate);
       doc.text(reportDate, (pageWidth - dateWidth) / 2, yPosition);
       
       yPosition += 30;
       
-      // Disclaimer Box
       doc.setFillColor(255, 248, 220);
       doc.rect(margin, yPosition, contentWidth, 35, 'F');
       doc.setDrawColor(255, 193, 7);
@@ -248,10 +292,10 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
       const splitDisclaimer = doc.splitTextToSize(disclaimerText, contentWidth - 10);
       doc.text(splitDisclaimer, margin + 5, yPosition + 15);
 
-      // EXECUTIVE SUMMARY PAGE
+      // --- EXECUTIVE SUMMARY PAGE ---
       doc.addPage();
       pageNumber++;
-      addHeaderFooter(doc, pageNumber, 1); // Placeholder total pages
+      addHeaderFooter(doc, pageNumber, 1); 
       yPosition = 45;
 
       doc.setFontSize(18);
@@ -261,7 +305,6 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
       
       yPosition += 15;
       
-      // Summary content box
       doc.setFillColor(248, 249, 250);
       doc.rect(margin, yPosition, contentWidth, 100, 'F');
       doc.setDrawColor(200, 200, 200);
@@ -271,39 +314,30 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
       yPosition += 15;
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
-      doc.text(`Portfolio Overview - ${properties.length} Properties Analyzed`, margin + 5, yPosition);
-      
+      doc.text(`Portfolio Overview - ${normalizedProperties.length} Properties Analyzed`, margin + 5, yPosition);
       yPosition += 12;
       doc.setFont('helvetica', 'normal');
       
-      // Property count by type
       const propertyTypes: { [key: string]: number } = {};
-      properties.forEach(p => {
-        const type = p.propertyType || 'Other';
+      normalizedProperties.forEach(p => {
+        const type = safeToString(p.propertyType) || 'Other';
         propertyTypes[type] = (propertyTypes[type] || 0) + 1;
       });
       
       doc.text('Property Distribution:', margin + 5, yPosition);
       yPosition += 8;
-      
       Object.entries(propertyTypes).forEach(([type, count]) => {
         doc.text(`• ${type}: ${count} properties`, margin + 10, yPosition);
         yPosition += 6;
       });
-      
       yPosition += 5;
       
-      // Price range analysis
-      const validBudgets = properties.filter(p => 
-        p.minimumBudget && typeof p.minimumBudget === 'number'
-      );
-      
+      const validBudgets = normalizedProperties.filter(p => p.minimumBudget && typeof p.minimumBudget === 'number');
       if (validBudgets.length > 0) {
         const budgets = validBudgets.map(p => p.minimumBudget as number);
         const minPrice = Math.min(...budgets);
         const maxPrice = Math.max(...budgets);
         const avgPrice = budgets.reduce((sum, price) => sum + price, 0) / budgets.length;
-        
         doc.text('Investment Range Analysis:', margin + 5, yPosition);
         yPosition += 6;
         doc.text(`• Price Range: ${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`, margin + 10, yPosition);
@@ -314,18 +348,14 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
         doc.text('Investment Range: Contact for detailed pricing', margin + 5, yPosition);
         yPosition += 6;
       }
-      
       yPosition += 5;
       
-      // Location summary
-      const validLocations = properties.map(p => p.location).filter(Boolean) as string[];
+      const validLocations = normalizedProperties.map(p => safeToString(p.location)).filter(loc => loc && loc !== 'N/A');
       const uniqueLocations = Array.from(new Set(validLocations));
-      
       doc.text('Geographic Coverage:', margin + 5, yPosition);
       yPosition += 6;
       doc.text(`• ${uniqueLocations.length} prime locations covered`, margin + 10, yPosition);
       yPosition += 6;
-      
       if (uniqueLocations.length <= 3) {
         uniqueLocations.forEach(location => {
           doc.text(`• ${location}`, margin + 10, yPosition);
@@ -335,56 +365,48 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
         doc.text(`• Key areas: ${uniqueLocations.slice(0, 3).join(', ')} and ${uniqueLocations.length - 3} more`, margin + 10, yPosition);
         yPosition += 5;
       }
-
       yPosition += 20;
 
-      // PROPERTY OVERVIEW SUMMARY
+      // --- PROPERTY OVERVIEW SUMMARY ---
       doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
       doc.text('PROPERTY OVERVIEW SUMMARY', margin, yPosition);
       yPosition += 15;
 
-      // Create a simple text-based summary instead of complex table
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      
-      properties.slice(0, 10).forEach((property, index) => {
-        // Check if we need a new page (allow 20mm space before footer)
+      normalizedProperties.slice(0, 10).forEach((property, index) => {
         if (yPosition > maxContentY - 20) {
-          doc.addPage();
-          pageNumber++;
-          addHeaderFooter(doc, pageNumber, 1); // Placeholder total pages
+          doc.addPage(); pageNumber++;
+          addHeaderFooter(doc, pageNumber, 1);
           yPosition = headerHeight + 15;
         }
-        
         doc.setFont('helvetica', 'bold');
-        doc.text(`${index + 1}. ${property.projectName || property.name || 'Property'}`, margin, yPosition);
+        doc.text(`${index + 1}. ${safeToString(property.projectName)}`, margin, yPosition);
         yPosition += 6;
-        
         doc.setFont('helvetica', 'normal');
-        doc.text(`Location: ${property.location || 'N/A'}`, margin + 5, yPosition);
+        doc.text(`Location: ${safeToString(property.location)}`, margin + 5, yPosition);
         yPosition += 4;
-        doc.text(`Type: ${property.propertyType || 'N/A'} | Config: ${property.configurations || 'N/A'}`, margin + 5, yPosition);
+        doc.text(`Type: ${safeToString(property.propertyType)} | Config: ${safeToString(property.configurations)}`, margin + 5, yPosition);
         yPosition += 4;
         doc.text(`Price: ${formatBudgetRange(property)}`, margin + 5, yPosition);
         yPosition += 8;
       });
-      
-      if (properties.length > 10) {
+      if (normalizedProperties.length > 10) {
         yPosition += 5;
         doc.setFont('helvetica', 'italic');
-        doc.text(`... and ${properties.length - 10} more properties detailed below`, margin, yPosition);
+        doc.text(`... and ${normalizedProperties.length - 10} more properties detailed below`, margin, yPosition);
         yPosition += 10;
       }
 
-      // DETAILED PROPERTY INFORMATION
+      // --- DETAILED PROPERTY INFORMATION ---
       let currentPropertyIndex = 0;
       const maxPropertiesPerDetailPage = 3;
 
-      while (currentPropertyIndex < properties.length) {
+      while (currentPropertyIndex < normalizedProperties.length) {
         doc.addPage();
         pageNumber++;
-        addHeaderFooter(doc, pageNumber, 1); // Placeholder total pages
+        addHeaderFooter(doc, pageNumber, 1); 
         yPosition = headerHeight + 15;
 
         doc.setFontSize(16);
@@ -392,16 +414,10 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
         doc.text('DETAILED PROPERTY INFORMATION', margin, yPosition);
         yPosition += 15;
 
-        // Show multiple properties per page with proper spacing
-        for (let i = 0; i < maxPropertiesPerDetailPage && currentPropertyIndex < properties.length; i++) {
-          const property = properties[currentPropertyIndex];
+        for (let i = 0; i < maxPropertiesPerDetailPage && currentPropertyIndex < normalizedProperties.length; i++) {
+          const property = normalizedProperties[currentPropertyIndex];
+          if (yPosition > maxContentY - 60) { break; }
           
-          // Check if we need a new page before adding property details
-          if (yPosition > maxContentY - 60) {
-            break; // Move to next page
-          }
-          
-          // Property header box
           doc.setFillColor(245, 245, 245);
           doc.rect(margin, yPosition, contentWidth, 12, 'F');
           doc.setDrawColor(23, 82, 255);
@@ -411,152 +427,83 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
           doc.setTextColor(0, 0, 0);
           doc.setFontSize(12);
           doc.setFont('helvetica', 'bold');
-          doc.text(`${currentPropertyIndex + 1}. ${property.projectName || property.name || 'Unnamed Property'}`, margin + 5, yPosition + 8);
-          
+          doc.text(`${currentPropertyIndex + 1}. ${safeToString(property.projectName)}`, margin + 5, yPosition + 8);
           yPosition += 18;
           
-          // Property details in structured format
           doc.setFontSize(10);
           doc.setFont('helvetica', 'normal');
           
-          const details = [
-            ['Developer:', property.developerName || property.builder || 'N/A'],
-            ['Location:', property.location || 'N/A'],
-            ['Property Type:', property.propertyType || 'N/A'],
-            ['Configurations:', property.configurations || 'N/A'],
+          const details: [string, string][] = [
+            ['Developer:', safeToString(property.developerName)],
+            ['Location:', safeToString(property.location)],
+            ['Property Type:', safeToString(property.propertyType)],
+            ['Configurations:', safeToString(property.configurations)],
             ['Price Range:', formatBudgetRange(property)],
-            ['Size Range:', property.minSizeSqft && property.maxSizeSqft ? 
-              `${property.minSizeSqft} - ${property.maxSizeSqft} sq ft` : 'Contact for details'],
-            ['RERA Number:', property.reraNumber || 'N/A'],
-            ['Total Units:', property.totalUnits ? property.totalUnits.toString() : 'N/A'],
-            ['Possession:', property.possessionDate || property.possession || 'N/A']
+            ['Size Range:', property.minSizeSqft && property.maxSizeSqft ? `${property.minSizeSqft} - ${property.maxSizeSqft} sq ft` : 'Contact for details'],
+            ['RERA Number:', safeToString(property.reraNumber)],
+            ['Total Units:', safeToString(property.totalUnits)],
+            ['Possession:', safeToString(property.possessionDate)]
           ];
-          
+
           details.forEach(([label, value]) => {
             doc.setFont('helvetica', 'bold');
             doc.text(label, margin + 5, yPosition);
             doc.setFont('helvetica', 'normal');
-            doc.text(value, margin + 40, yPosition);
-            yPosition += 6;
+            const wrappedValue = doc.splitTextToSize(value, contentWidth - 45); // Wrap long values
+            doc.text(wrappedValue, margin + 40, yPosition);
+            yPosition += (Array.isArray(wrappedValue) ? wrappedValue.length : 1) * 5 + 1; // Adjust y based on lines
           });
-          
-          // Amenities section with safe handling and page break check
-          try {
-            if (property.amenities && Array.isArray(property.amenities) && property.amenities.length > 0) {
-              // Check if we have space for amenities section
-              if (yPosition > maxContentY - 30) {
-                break; // Move to next page
-              }
-              
+
+          const renderSection = (title: string, data: any[] | null | undefined) => {
+            // Debug log for development
+            // console.log('renderSection', title, data, safeToString(data));
+            if (data && Array.isArray(data) && data.length > 0) {
+              if (yPosition > maxContentY - 25) { return false; }
               yPosition += 5;
               doc.setFont('helvetica', 'bold');
-              doc.text('Amenities & Features:', margin + 5, yPosition);
+              doc.text(title, margin + 5, yPosition);
               yPosition += 6;
-              
               doc.setFont('helvetica', 'normal');
-              // Clean amenities text by removing bracket numbers like [3][5]
-              const cleanAmenities = property.amenities
-                .filter(Boolean)
-                .map(amenity => amenity.replace(/\[\d+\]/g, '').trim())
-                .filter(amenity => amenity.length > 0);
-              const amenitiesText = cleanAmenities.join(', ');
-              if (amenitiesText) {
-                const wrappedAmenities = doc.splitTextToSize(amenitiesText, contentWidth - 10);
-                if (Array.isArray(wrappedAmenities)) {
-                  wrappedAmenities.forEach((line: string) => {
-                    if (yPosition > maxContentY - 10) return; // Stop if too close to footer
-                    doc.text(line, margin + 5, yPosition);
-                    yPosition += 5;
-                  });
-                } else {
-                  if (yPosition <= maxContentY - 10) {
-                    doc.text(wrappedAmenities, margin + 5, yPosition);
-                    yPosition += 5;
-                  }
-                }
-                yPosition += 5;
+              let text = safeToString(data);
+              if (Array.isArray(text)) {
+                text = text.join(', ');
               }
-            }
-          } catch (amenitiesError) {
-            console.warn('Error processing amenities:', amenitiesError);
-          }
-          
-          // Additional features with safe handling and page break check
-          try {
-            if (property.features && Array.isArray(property.features) && property.features.length > 0) {
-              if (yPosition > maxContentY - 25) {
-                break; // Move to next page
-              }
-              
-              doc.setFont('helvetica', 'bold');
-              doc.text('Additional Features:', margin + 5, yPosition);
-              yPosition += 6;
-              
-              doc.setFont('helvetica', 'normal');
-              // Clean features text by removing bracket numbers like [3][5]
-              const cleanFeatures = property.features
-                .filter(Boolean)
-                .map(feature => feature.replace(/\[\d+\]/g, '').trim())
-                .filter(feature => feature.length > 0);
-              const featuresText = cleanFeatures.join(', ');
-              if (featuresText) {
-                const wrappedFeatures = doc.splitTextToSize(featuresText, contentWidth - 10);
-                if (Array.isArray(wrappedFeatures)) {
-                  wrappedFeatures.forEach((line: string) => {
-                    if (yPosition > maxContentY - 10) return;
-                    doc.text(line, margin + 5, yPosition);
-                    yPosition += 5;
-                  });
-                } else {
-                  if (yPosition <= maxContentY - 10) {
-                    doc.text(wrappedFeatures, margin + 5, yPosition);
-                    yPosition += 5;
-                  }
-                }
-                yPosition += 5;
-              }
-            }
-          } catch (featuresError) {
-            console.warn('Error processing features:', featuresError);
-          }
-          
-          // Description with safe handling and page break check
-          try {
-            const description = property.description || property.remarksComments;
-            if (description && typeof description === 'string' && description.trim()) {
-              if (yPosition > maxContentY - 20) {
-                break; // Move to next page
-              }
-              
-              doc.setFont('helvetica', 'bold');
-              doc.text('Description:', margin + 5, yPosition);
-              yPosition += 6;
-              
-              doc.setFont('helvetica', 'normal');
-              const wrappedDescription = doc.splitTextToSize(description.trim(), contentWidth - 10);
-              if (Array.isArray(wrappedDescription)) {
-                wrappedDescription.forEach((line: string) => {
+              text = String(text).replace(/\[\d+\]/g, ''); // Ensure string and clean
+              if (text && text !== 'N/A') {
+                const wrappedText = doc.splitTextToSize(text, contentWidth - 10);
+                wrappedText.forEach((line: string) => {
                   if (yPosition > maxContentY - 10) return;
                   doc.text(line, margin + 5, yPosition);
                   yPosition += 5;
                 });
-              } else {
-                if (yPosition <= maxContentY - 10) {
-                  doc.text(wrappedDescription, margin + 5, yPosition);
-                  yPosition += 5;
-                }
+                yPosition += 5;
               }
-              yPosition += 10;
-            } else {
-              yPosition += 10;
             }
-          } catch (descriptionError) {
-            console.warn('Error processing description:', descriptionError);
+            return true;
+          };
+
+          if(!renderSection('Amenities & Features:', property.amenities)) { break; };
+          if(!renderSection('Additional Features:', property.features)) { break; };
+          
+          const description = property.description || property.remarksComments;
+          if (description && typeof description === 'string' && description.trim()) {
+            if (yPosition > maxContentY - 20) { break; }
+            doc.setFont('helvetica', 'bold');
+            doc.text('Description:', margin + 5, yPosition);
+            yPosition += 6;
+            doc.setFont('helvetica', 'normal');
+            const wrappedDescription = doc.splitTextToSize(description.trim(), contentWidth - 10);
+            wrappedDescription.forEach((line: string) => {
+              if (yPosition > maxContentY - 10) return;
+              doc.text(line, margin + 5, yPosition);
+              yPosition += 5;
+            });
+            yPosition += 10;
+          } else {
             yPosition += 10;
           }
           
-          // Separator line between properties
-          if (i < maxPropertiesPerDetailPage - 1 && currentPropertyIndex + 1 < properties.length) {
+          if (i < maxPropertiesPerDetailPage - 1 && currentPropertyIndex + 1 < normalizedProperties.length) {
             doc.setDrawColor(200, 200, 200);
             doc.setLineWidth(0.5);
             doc.line(margin, yPosition, pageWidth - margin, yPosition);
@@ -564,52 +511,20 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
           }
           
           currentPropertyIndex++;
-          
-          // Check if we need a new page
-          if (yPosition > pageHeight - 60) {
-            break;
-          }
+          if (yPosition > pageHeight - 60) { break; }
         }
       }
 
-      // Now we know the actual total pages, update all page footers
+      // --- FINALIZATION ---
       totalPages = pageNumber;
-      
-      // Update footers on all pages with correct page numbers
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
-        
-        // Clear the old footer area
         const footerStartY = pageHeight - footerHeight;
         doc.setFillColor(255, 255, 255);
         doc.rect(0, footerStartY, pageWidth, footerHeight, 'F');
-        
-        // Redraw the footer with correct page numbers
-        doc.setFillColor(248, 248, 248);
-        doc.rect(0, footerStartY, pageWidth, footerHeight, 'F');
-        
-        // Footer separator line
-        doc.setDrawColor(200, 200, 200);
-        doc.setLineWidth(0.5);
-        doc.line(0, footerStartY, pageWidth, footerStartY);
-        
-        // Footer text
-        doc.setTextColor(80, 80, 80);
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'normal');
-        
-        // Page number (right aligned)
-        const pageText = `Page ${i} of ${totalPages}`;
-        const pageTextWidth = doc.getTextWidth(pageText);
-        doc.text(pageText, pageWidth - 20 - pageTextWidth, footerStartY + 8);
-        
-        // Company information (left aligned)
-        doc.text('Relai Technologies Pvt. Ltd. | Property Investment Advisory Services', 20, footerStartY + 8);
-        doc.text('Email: connect@relai.world | Phone: +91 888 108 8890 | Website: www.relai.in', 20, footerStartY + 15);
-        doc.text('Confidential Investment Report - For Client Use Only', 20, footerStartY + 22);
+        addHeaderFooter(doc, i, totalPages);
       }
 
-      // Save the PDF
       const fileName = `Relai_Property_Report_${userData.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(fileName);
 
@@ -624,16 +539,9 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
 
     } catch (error) {
       console.error('PDF generation error:', error);
-      console.error('Error details:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined,
-        properties: properties.length,
-        userData
-      });
-      
       toast({
         title: "PDF Generation Failed",
-        description: error instanceof Error ? error.message : "There was an error generating the PDF. Please try again.",
+        description: error instanceof Error ? error.message : "An unknown error occurred while generating the PDF.",
         variant: "destructive",
       });
     } finally {
@@ -661,84 +569,39 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
               Generate Professional PDF Report
             </p>
             <p className="text-blue-600 text-sm mt-1">
-              Get a comprehensive analysis of {properties.length} matching properties with detailed information and amenities.
+              Get a comprehensive analysis of {normalizedProperties.length} matching properties with detailed information and amenities.
             </p>
           </div>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
+              <FormField control={form.control} name="name" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <User className="h-4 w-4" />
-                      Full Name
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter your full name" {...field} />
-                    </FormControl>
+                    <FormLabel className="flex items-center gap-2"><User className="h-4 w-4" />Full Name</FormLabel>
+                    <FormControl><Input placeholder="Enter your full name" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
+              )}/>
+              <FormField control={form.control} name="phone" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <Phone className="h-4 w-4" />
-                      Phone Number
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter your phone number" {...field} />
-                    </FormControl>
+                    <FormLabel className="flex items-center gap-2"><Phone className="h-4 w-4" />Phone Number</FormLabel>
+                    <FormControl><Input placeholder="Enter your phone number" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
+              )}/>
+              <FormField control={form.control} name="email" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <Mail className="h-4 w-4" />
-                      Email Address
-                    </FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="Enter your email address" {...field} />
-                    </FormControl>
+                    <FormLabel className="flex items-center gap-2"><Mail className="h-4 w-4" />Email Address</FormLabel>
+                    <FormControl><Input type="email" placeholder="Enter your email address" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
-                )}
-              />
+              )}/>
 
               <div className="flex gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onClose}
-                  className="flex-1"
-                  disabled={isGenerating}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
-                  disabled={isGenerating}
-                >
+                <Button type="button" variant="outline" onClick={onClose} className="flex-1" disabled={isGenerating}>Cancel</Button>
+                <Button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800" disabled={isGenerating}>
                   {isGenerating ? (
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="mr-2"
-                    >
+                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} className="mr-2">
                       <Download className="h-4 w-4" />
                     </motion.div>
                   ) : (
@@ -753,4 +616,29 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
       </DialogContent>
     </Dialog>
   );
+}
+
+function mapPropertyData(raw) {
+  return {
+    projectName: raw.ProjectName || raw.projectName || raw.name || "N/A",
+    developerName: raw.BuilderName || raw.developerName || raw.builder || "N/A",
+    location: raw.Area || raw.location || "N/A",
+    propertyType: raw.PropertyType || raw.propertyType || "N/A",
+    configurations: Array.isArray(raw.configurations)
+      ? raw.configurations.map(cfg => cfg.name || cfg.type || JSON.stringify(cfg)).join(', ')
+      : (raw.configurations || "N/A"),
+    minimumBudget: raw.Min_Price || raw.minimumBudget || null,
+    maximumBudget: raw.Max_Price || raw.maximumBudget || null,
+    pricePerSqft: raw.Price_per_sft || raw.pricePerSqft || raw.price_per_sqft || null,
+    minSizeSqft: raw.Min_Size || raw.minSizeSqft || null,
+    maxSizeSqft: raw.Max_Size || raw.maxSizeSqft || null,
+    possessionDate: raw.Possession_date || raw.possessionDate || raw.possession || null,
+    reraNumber: raw.RERA_Number || raw.reraNumber || null,
+    totalUnits: raw.Total_Units || raw.totalUnits || null,
+    amenities: raw.amenities || [],
+    features: raw.features || [],
+    description: raw.Description || raw.description || null,
+    remarksComments: raw.Remarks || raw.remarksComments || null,
+    // ...add more fields as needed
+  };
 }

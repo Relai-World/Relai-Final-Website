@@ -55,3 +55,25 @@ export type Property = {
   possession: string;
   rating: number;
 };
+
+// Types for property preferences and user information
+export type PropertyPreference = {
+  budget?: string;
+  possession?: string;
+  configuration?: string;
+  locations?: string[];
+  otherLocation?: string;
+  propertyType?: string;
+  communityType?: string;
+  minBudget?: number;
+  maxBudget?: number;
+  minPricePerSqft?: number;
+  maxPricePerSqft?: number;
+};
+
+export type UserInfo = {
+  name: string;
+  phone: string;
+  appointmentDate: Date | undefined;
+  appointmentTime: string;
+};
