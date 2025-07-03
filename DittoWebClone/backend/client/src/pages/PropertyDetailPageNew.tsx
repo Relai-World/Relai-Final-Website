@@ -98,7 +98,7 @@ export default function PropertyDetailPageNew() {
               .then(res => res.json())
               .then(data => {
                 console.log('Coordinates saved to backend:', data);
-                queryClient.invalidateQueries(['/api/property-by-id', propertyId]);
+                queryClient.invalidateQueries({ queryKey: ['/api/property-by-id', propertyId] });
               })
               .catch(err => {
                 console.error('Failed to save coordinates:', err);
@@ -261,8 +261,8 @@ export default function PropertyDetailPageNew() {
     </div>
     {/* Breadcrumbs */}
     <div className="text-sm text-gray-500 mb-6">
-      <span onClick={() => navigate("/")} className="hover:text-[#1752FF] cursor-pointer">Home</span> >{' '}
-      <span onClick={() => navigate("/properties")} className="hover:text-[#1752FF] cursor-pointer">Properties</span> >{' '}
+      <span onClick={() => navigate("/")} className="hover:text-[#1752FF] cursor-pointer">Home</span> {'>'} {' '}
+      <span onClick={() => navigate("/properties")} className="hover:text-[#1752FF] cursor-pointer">Properties</span> {'>'} {' '}
       <span className="text-[#1752FF]">{property.projectName || property.name}</span>
     </div>
     
