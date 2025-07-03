@@ -3,7 +3,6 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { useEffect } from "react";
-import PropertyComparisonSimple from "@/pages/PropertyComparisonSimple";
 import { initAntiScraping } from "./lib/antiScraping";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/HomePage";
@@ -44,6 +43,7 @@ import DatabaseInspectionPage from "@/pages/DatabaseInspectionPage";
 
 // Property Comparison Page
 import PropertyComparisonPage from "@/pages/PropertyComparisonTable";
+import PropertyComparisonSimple from "@/pages/PropertyComparisonSimple";
 
 // Blog Pages
 import BlogPage from "@/pages/BlogPage";
@@ -95,9 +95,9 @@ function Router() {
       <Route path="/tools/rate-analyzer" component={PropertyRateAnalyzerPage} />
       
       {/* Property Comparison Page */}
-      {/* changes by me */}
-      <Route path="/comparison" component={PropertyComparisonPage} />
+      <Route path="/compare" component={PropertyComparisonPage} />
       <Route path="/compare-properties" component={PropertyComparisonPage} />
+      <Route path="/compare-simple" component={PropertyComparisonSimple} />
       
       {/* AI Assistant Page */}
       <Route path="/ai-assistant" component={AIChatbotPage} />

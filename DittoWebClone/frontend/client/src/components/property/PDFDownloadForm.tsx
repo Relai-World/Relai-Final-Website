@@ -66,6 +66,7 @@ interface PDFDownloadFormProps {
 export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDownloadFormProps) {
   // Normalize incoming properties
   const normalizedProperties = properties.map(mapPropertyData);
+  console.log('Normalized Properties:', normalizedProperties);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
@@ -277,7 +278,7 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
     setIsGenerating(true);
     
     try {
-      console.log('Properties passed to PDFDownloadForm:', normalizedProperties);
+      console.log('Properties passed to PDFDownloadForm:', properties);
       const doc = new jsPDF('p', 'mm', 'a4');
       
       const pageWidth = doc.internal.pageSize.width;
@@ -386,7 +387,7 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
         const type = safeToString(p.propertyType) || 'Other';
         propertyTypes[type] = (propertyTypes[type] || 0) + 1;
       });
-      
+
       doc.text('Property Distribution:', margin + 5, yPosition);
       yPosition += 8;
       Object.entries(propertyTypes).forEach(([type, count]) => {
@@ -466,14 +467,7 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
       let currentPropertyIndex = 0;
       const maxPropertiesPerDetailPage = 3;
 
-<<<<<<< HEAD
-      // Normalize all properties using the same logic as property cards
-      const normalizedProperties = properties.map((p: any) => normalizePropertyForPDF(p));
-
-      while (currentPropertyIndex < properties.length) {
-=======
       while (currentPropertyIndex < normalizedProperties.length) {
->>>>>>> 7ff30a2765f717b26334464b78a0f330e7712cb1
         doc.addPage();
         pageNumber++;
         addHeaderFooter(doc, pageNumber, 1); 
@@ -503,18 +497,6 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
           doc.setFontSize(10);
           doc.setFont('helvetica', 'normal');
           
-<<<<<<< HEAD
-          const details = [
-            ['Developer:', property.developerName || property.builder || 'N/A'],
-            ['Location:', property.location || 'N/A'],
-            ['Property Type:', property.propertyType || 'N/A'],
-            ['Configurations:', property.configurations || 'N/A'],
-            ['Price Range:', property.priceRange || 'Price not available'],
-            ['Size Range:', property.sizeRange || 'N/A'],
-            ['RERA Number:', property.reraNumber || 'N/A'],
-            ['Total Units:', property.totalUnits ? property.totalUnits.toString() : 'N/A'],
-            ['Possession:', property.possessionDate || property.possession || 'N/A']
-=======
           const details: [string, string][] = [
             ['Developer:', safeToString(property.developerName)],
             ['Location:', safeToString(property.location)],
@@ -525,7 +507,6 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
             ['RERA Number:', safeToString(property.reraNumber)],
             ['Total Units:', safeToString(property.totalUnits)],
             ['Possession:', safeToString(property.possessionDate)]
->>>>>>> 7ff30a2765f717b26334464b78a0f330e7712cb1
           ];
 
           details.forEach(([label, value]) => {
@@ -701,14 +682,14 @@ export default function PDFDownloadForm({ properties, isOpen, onClose }: PDFDown
   );
 }
 
-function mapPropertyData(raw) {
+function mapPropertyData(raw: any) {
   return {
     projectName: raw.ProjectName || raw.projectName || raw.name || "N/A",
     developerName: raw.BuilderName || raw.developerName || raw.builder || "N/A",
     location: raw.Area || raw.location || "N/A",
     propertyType: raw.PropertyType || raw.propertyType || "N/A",
     configurations: Array.isArray(raw.configurations)
-      ? raw.configurations.map(cfg => cfg.name || cfg.type || JSON.stringify(cfg)).join(', ')
+      ? raw.configurations.map((cfg: any) => cfg.name || cfg.type || JSON.stringify(cfg)).join(', ')
       : (raw.configurations || "N/A"),
     minimumBudget: raw.Min_Price || raw.minimumBudget || null,
     maximumBudget: raw.Max_Price || raw.maximumBudget || null,

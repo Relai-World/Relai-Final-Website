@@ -115,12 +115,16 @@ const getPropertyImages = (property: Property): string[] => {
 function getPropertyImagePath(property: Property): string {
   if (property.images && property.images.length > 0) {
     if (property.images[0].startsWith('http')) return property.images[0];
-    return `http://localhost:5001/property_images/${property.images[0]}`;
+    // Remove '/property_images/' if present
+    const imgName = property.images[0].replace(/^\/property_images\//, '');
+    return `http://localhost:5001/property_images/${imgName}`;
   }
   const name = (property.projectName || '').toLowerCase().replace(/\s+/g, '_20');
   const loc = (property.location || property.Area || '').toLowerCase().replace(/\s+/g, '_20');
   if (!name || !loc) return '/img/placeholder-property.png';
-  return `http://localhost:5001/property_images/${name}_${loc}_0.jpg`;
+  // Remove '/property_images/' from the start if present
+  const imgName = `${name}_${loc}_0.jpg`.replace(/^\/property_images\//, '');
+  return `http://localhost:5001/property_images/${imgName}`;
 }
 
 // Helper to format number as Indian currency (e.g., 6003720 -> 63,03,720)
@@ -618,7 +622,11 @@ export default function PropertyResultsNew({ properties, preferences }: Property
                           </div>
                           {/* Property Image */}
                           <img
-                            src={getPropertyImagePath(property)}
+                            src={(() => {
+                              const path = getPropertyImagePath(property);
+                              console.log('Property:', property, 'Image Path:', path);
+                              return path;
+                            })()}
                             alt={property.projectName}
                             className="w-full h-full object-cover"
                             onError={e => { (e.target as HTMLImageElement).src = '/img/placeholder-property.png'; }}
