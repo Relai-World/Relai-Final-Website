@@ -22,6 +22,12 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
+  // Only setup Vite in development mode
+  if (process.env.NODE_ENV === "production") {
+    console.log("🚀 Production mode: Skipping Vite dev server setup");
+    return;
+  }
+
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
@@ -78,11 +84,21 @@ export function serveStatic(app: Express) {
   const distPath = resolvePath(import.meta.url, "..", "public");
 
   if (!fs.existsSync(distPath)) {
-    throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`,
-    );
+    console.warn(`⚠️ Build directory not found: ${distPath}`);
+    console.warn("⚠️ This is expected if you're deploying frontend separately");
+    console.warn("⚠️ Make sure to build the client first or deploy frontend separately");
+    
+    // In production, if no build exists, serve a simple message
+    app.use("*", (_req, res) => {
+      res.status(404).json({
+        message: "Frontend not built. Please build the client first or deploy frontend separately.",
+        error: "BUILD_NOT_FOUND"
+      });
+    });
+    return;
   }
 
+  console.log(`✅ Serving static files from: ${distPath}`);
   app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist
