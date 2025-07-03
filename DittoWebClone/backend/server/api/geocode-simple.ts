@@ -1,11 +1,7 @@
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-// Get the directory name in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { resolvePath } from '../utils/path-utils';
 
 export interface GeocodeResult {
   location: string;
@@ -14,7 +10,7 @@ export interface GeocodeResult {
 }
 
 // Path to store the geocoded locations cache
-const cacheFilePath = path.join(__dirname, '../../geocoded-locations-cache.json');
+const cacheFilePath = resolvePath(import.meta.url, '../../geocoded-locations-cache.json');
 
 // Cache expiration time in milliseconds (90 days)
 // Extended significantly to minimize API calls

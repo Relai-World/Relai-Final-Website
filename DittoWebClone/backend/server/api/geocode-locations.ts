@@ -2,11 +2,7 @@ import axios from 'axios';
 import { getUniqueLocations } from './property-locations';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-// Get the directory name in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { resolvePath } from '../utils/path-utils';
 
 interface GeocodeResult {
   location: string;
@@ -58,7 +54,7 @@ async function geocodeLocation(location: string): Promise<{lat: number, lng: num
 }
 
 // Path to store the geocoded locations cache
-const cacheFilePath = path.join(__dirname, '../../geocoded-locations-cache.json');
+const cacheFilePath = resolvePath(import.meta.url, '../../geocoded-locations-cache.json');
 
 /**
  * Geocodes all unique locations and saves them to a cache file

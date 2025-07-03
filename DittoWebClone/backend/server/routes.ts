@@ -65,10 +65,7 @@ import {
 } from "./api/populate-images";
 import cors from 'cors';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { resolvePath } from './utils/path-utils';
 
 /**
  * Preload all unique locations from the database to minimize API calls 
@@ -433,7 +430,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.use('/property_images', express.static(path.join(__dirname, 'public/property_images')));
+  app.use('/property_images', express.static(resolvePath(import.meta.url, 'public/property_images')));
 
   const httpServer = createServer(app);
   return httpServer;

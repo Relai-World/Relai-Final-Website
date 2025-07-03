@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import themePlugin from "@replit/vite-plugin-shadcn-theme-json";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+import { resolvePath } from "./server/utils/path-utils";
 
 export default defineConfig({
   plugins: [
@@ -20,14 +21,14 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@": path.resolve(import.meta.dirname, "client", "src"),
-      "@shared": path.resolve(import.meta.dirname, "shared"),
-      "@assets": path.resolve(import.meta.dirname, "attached_assets"),
+      "@": resolvePath(import.meta.url, "client", "src"),
+      "@shared": resolvePath(import.meta.url, "shared"),
+      "@assets": resolvePath(import.meta.url, "attached_assets"),
     },
   },
-  root: path.resolve(import.meta.dirname, "client"),
+  root: resolvePath(import.meta.url, "client"),
   build: {
-    outDir: path.resolve(import.meta.dirname, "public"),
+    outDir: resolvePath(import.meta.url, "public"),
     emptyOutDir: true,
   },
 }); 

@@ -1,11 +1,8 @@
 import { fileURLToPath } from 'url';
 import path from 'path';
 import cors from 'cors';
+import fs from 'fs';
 import type { CorsOptionsDelegate, CorsRequest } from 'cors';
-
-// Fix for __dirname in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
@@ -21,17 +18,41 @@ import {
   honeypot 
 } from "./antiScraping";
 
-// Explicitly load .env from project root
-const envPath = path.resolve(__dirname, '../../.env');
-dotenv.config({ path: envPath });
+// Fix for __dirname in ES modules with fallback
+let __dirname: string;
+try {
+  const __filename = fileURLToPath(import.meta.url);
+  __dirname = path.dirname(__filename);
+} catch (error) {
+  console.warn('⚠️ Could not resolve __dirname, using process.cwd() as fallback');
+  __dirname = process.cwd();
+}
 
-// Log the API key status (masked for security)
-if (process.env.GOOGLE_API_KEY) {
-  console.log('Google Maps API Key loaded successfully');
-  // Debug print (first 6 chars only for safety)
-  console.log('GOOGLE_API_KEY:', process.env.GOOGLE_API_KEY.slice(0, 6) + '...');
-} else {
-  console.warn('Google Maps API Key not found in environment variables');
+// Try to load .env file with multiple fallback locations
+const possibleEnvPaths = [
+  path.resolve(__dirname, '../../.env'),
+  path.resolve(__dirname, '../.env'),
+  path.resolve(__dirname, '.env'),
+  path.resolve(process.cwd(), '.env'),
+  path.resolve(process.cwd(), '../.env'),
+  path.resolve(process.cwd(), '../../.env')
+];
+
+let envLoaded = false;
+for (const envPath of possibleEnvPaths) {
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+    console.log('✅ Loaded env:', envPath);
+    envLoaded = true;
+    break;
+  }
+}
+
+if (!envLoaded) {
+  console.warn('⚠️ No .env file found in any of the expected locations');
+  console.warn('⚠️ Expected locations:', possibleEnvPaths);
+  // Still try to load from environment variables
+  dotenv.config();
 }
 
 const app = express();

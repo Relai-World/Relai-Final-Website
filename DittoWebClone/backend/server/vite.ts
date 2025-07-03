@@ -6,6 +6,7 @@ import { type Server } from "http";
 import viteConfig from "../vite.config";
 import { nanoid } from "nanoid";
 import { ObjectId } from 'mongodb';
+import { resolvePath } from './utils/path-utils';
 
 const viteLogger = createLogger();
 
@@ -44,15 +45,15 @@ export async function setupVite(app: Express, server: Server) {
   app.use(vite.middlewares);
   
   // Add static file serving for property images in development
-  const publicPath = path.resolve(import.meta.dirname, "..", "public");
+  const publicPath = resolvePath(import.meta.url, "..", "public");
   app.use(express.static(publicPath));
   
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
     try {
-      const clientTemplate = path.resolve(
-        import.meta.dirname,
+      const clientTemplate = resolvePath(
+        import.meta.url,
         "..",
         "client",
         "index.html",
@@ -74,7 +75,7 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "..", "public");
+  const distPath = resolvePath(import.meta.url, "..", "public");
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
