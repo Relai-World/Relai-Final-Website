@@ -9,7 +9,7 @@ import HomePage from "@/pages/HomePage";
 import AboutUsPage from "@/pages/AboutUsPage";
 import PropertyFormPage from "@/pages/PropertyFormPage";
 // import PropertyWizardPage from "@/pages/PropertyWizardPage";
-import PropertyDetailPageNew  from "@/pages/PropertyDetailPageNew";
+import { PropertyDetailPageNew } from "@/pages/PropertyDetailPageNew";
 import GroupBuyingPage from "@/pages/GroupBuyingPage";
 import ContactUsPage from "@/pages/ContactUsPage";
 import TermsPage from "@/pages/TermsPage";
