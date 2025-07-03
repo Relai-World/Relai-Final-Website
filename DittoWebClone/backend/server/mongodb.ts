@@ -6,6 +6,7 @@ dotenv.config();
 
 // MongoDB connection string
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://subscriptions:Subcribe%40Mongodb@cluster0.vynzql2.mongodb.net/Relai?retryWrites=true&w=majority&appName=Cluster0';
+console.log('MONGODB_URI:', MONGODB_URI);
 
 // MongoDB connection options
 const options = {
