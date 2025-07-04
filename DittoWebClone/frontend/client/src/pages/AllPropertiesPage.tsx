@@ -51,8 +51,8 @@ const extractPropertyData = (property: any): any => {
 
 // Define the backend URL for constructing image paths
 // In a real app, this should come from an environment variable (e.g., import.meta.env.VITE_API_URL)
-const API_BASE_URL_PROPERTIES = import.meta.env.VITE_API_URL_PROPERTIES || 'http://localhost:3000';
-const API_BASE_URL_OTHERS = import.meta.env.VITE_API_URL_OTHERS || 'http://localhost:5001';
+const API_BASE_URL_PROPERTIES = 'http://65.0.19.97:3000';
+const API_BASE_URL_OTHERS = 'http://65.0.19.97:3000';
 
 // Helper function to format date from DD-MM-YYYY to MM-YY (e.g., "01-08-2028" -> "08-28")
 const formatPossessionDate = (dateStr?: string): string => {
