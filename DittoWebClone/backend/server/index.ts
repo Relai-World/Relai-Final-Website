@@ -60,7 +60,7 @@ const app = express();
 // CORS middleware to allow cross-origin requests from any localhost port for development
 app.use(cors({
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    if (!origin || origin.startsWith('http://localhost:')) {
+    if (!origin || origin.startsWith('http://localhost:') || origin.startsWith('http://65.0.19.97:')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
