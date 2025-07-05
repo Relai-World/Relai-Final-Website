@@ -4,11 +4,7 @@ import themePlugin from "@replit/vite-plugin-shadcn-theme-json";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import dotenv from 'dotenv';
-dotenv.config({ path: path.resolve(__dirname, '.env.development') });  // manually load
 
-
-const API_URL = process.env.VITE_API_URL || 'http://localhost:5001';
-const PORT = parseInt(process.env.VITE_PORT || '3000');
 
 export default defineConfig(({ mode }) => {
   // Manually load the right .env file
@@ -17,6 +13,8 @@ export default defineConfig(({ mode }) => {
   const API_URL = process.env.VITE_API_URL || 'http://localhost:5001';
   const PORT = parseInt(process.env.VITE_PORT || '3000');
 
+  console.log(`Using API URL: ${API_URL}`);
+  
   return {
     plugins: [
       react(),
