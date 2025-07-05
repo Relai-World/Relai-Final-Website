@@ -113,18 +113,19 @@ const getPropertyImages = (property: Property): string[] => {
 
 // Helper to get property image path like All Properties page
 function getPropertyImagePath(property: Property): string {
+  const API_URL= import.meta.env.VITE_API_URL || 'http://localhost:5001';
   if (property.images && property.images.length > 0) {
     if (property.images[0].startsWith('http')) return property.images[0];
     // Remove '/property_images/' if present
     const imgName = property.images[0].replace(/^\/property_images\//, '');
-    return `http://localhost:5001/property_images/${imgName}`;
+    return `${API_URL}/property_images/${imgName}`;
   }
   const name = (property.projectName || '').toLowerCase().replace(/\s+/g, '_20');
   const loc = (property.location || property.Area || '').toLowerCase().replace(/\s+/g, '_20');
   if (!name || !loc) return '/img/placeholder-property.png';
   // Remove '/property_images/' from the start if present
   const imgName = `${name}_${loc}_0.jpg`.replace(/^\/property_images\//, '');
-  return `http://localhost:5001/property_images/${imgName}`;
+  return `${API_URL}/property_images/${imgName}`;
 }
 
 // Helper to format number as Indian currency (e.g., 6003720 -> 63,03,720)
