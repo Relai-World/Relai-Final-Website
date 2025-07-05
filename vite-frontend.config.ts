@@ -3,33 +3,48 @@ import react from "@vitejs/plugin-react";
 import themePlugin from "@replit/vite-plugin-shadcn-theme-json";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+import dotenv from 'dotenv';
+dotenv.config({ path: path.resolve(__dirname, '.env.development') });  // manually load
 
-export default defineConfig({
-  plugins: [
-    react(),
-    runtimeErrorOverlay(),
-    themePlugin(),
-  ],
-  resolve: {
-    alias: {
-      "@": path.resolve(import.meta.dirname, "DittoWebClone", "frontend", "client", "src"),
-      "@shared": path.resolve(import.meta.dirname, "shared"),
-      "@assets": path.resolve(import.meta.dirname, "attached_assets"),
+
+const API_URL = process.env.VITE_API_URL || 'http://localhost:5001';
+const PORT = parseInt(process.env.VITE_PORT || '3000');
+
+export default defineConfig(({ mode }) => {
+  // Manually load the right .env file
+  dotenv.config({ path: path.resolve(__dirname, `.env.${mode}`) });
+
+  const API_URL = process.env.VITE_API_URL || 'http://localhost:5001';
+  const PORT = parseInt(process.env.VITE_PORT || '3000');
+
+  return {
+    plugins: [
+      react(),
+      runtimeErrorOverlay(),
+      themePlugin(),
+    ],
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "DittoWebClone", "frontend", "client", "src"),
+        "@shared": path.resolve(__dirname, "shared"),
+        "@assets": path.resolve(__dirname, "attached_assets"),
+      },
     },
-  },
-  root: path.resolve(import.meta.dirname, "DittoWebClone", "frontend", "client"),
-  server: {
-    host: '0.0.0.0',  
-    port: 3000,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5001',
-        changeOrigin: true,
-      }
-    }
-  },
-  build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
-    emptyOutDir: true,
-  },
-}); 
+    root: path.resolve(__dirname, "DittoWebClone", "frontend", "client"),
+    server: {
+      host: '0.0.0.0',
+      port: PORT,
+      proxy: {
+        '/api': {
+          target: API_URL,
+          changeOrigin: true,
+        },
+      },
+    },
+    build: {
+      outDir: path.resolve(__dirname, "dist/public"),
+      emptyOutDir: true,
+    },
+  };
+});
+
