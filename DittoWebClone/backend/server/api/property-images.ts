@@ -53,7 +53,7 @@ export async function fetchAndStoreAllPropertyImagesSupabase(req: Request, res: 
         let imagesToStore: string[] = [];
 
         if (mapImagesResponse.ok) {
-          const mapData = await mapImagesResponse.json();
+          const mapData = await mapImagesResponse.json() as { images?: string[] };
           if (mapData.images && Array.isArray(mapData.images) && mapData.images.length > 0) {
             imagesToStore = mapData.images;
             console.log(`Found ${imagesToStore.length} images from /api/map-images for ${property.projectName}`);
@@ -376,7 +376,7 @@ export async function refreshAllPropertyImages() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data = await response.json();
+        const data = await response.json() as { images?: string[] };
         const images = data.images || [];
         
         if (images.length > 0) {
