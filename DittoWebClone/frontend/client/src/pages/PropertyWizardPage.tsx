@@ -121,12 +121,13 @@ export default function PropertyWizardPage() {
     appointmentDate: undefined,
     appointmentTime: "",
   });
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 
   // Fetch all properties for filtering (not just filtered from backend)
   const { data: allPropertiesData, isLoading: isLoadingAllProperties } = useQuery({
     queryKey: ["/api/all-properties-wizard"],
     queryFn: async () => {
-      const response = await fetch("http://13.235.48.178:5001/api/all-properties");
+      const response = await fetch(`${API_BASE_URL}/api/all-properties`);
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Backend error:", errorText);
