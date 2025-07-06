@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
   dotenv.config({ path: path.resolve(__dirname, `.env.${mode}`) });
 
   const API_URL = process.env.VITE_API_URL || 'http://localhost:5001';
-  const PORT = parseInt(process.env.VITE_PORT || '3000');
+  const PORT = parseInt(process.env.VITE_PORT || '5001');
 
   console.log(`Using API URL: ${API_URL}`);
   
