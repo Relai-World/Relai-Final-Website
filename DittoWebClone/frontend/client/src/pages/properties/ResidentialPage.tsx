@@ -28,12 +28,31 @@ type ApiProperty = {
   [key: string]: any; 
 };
 
-const API_BASE_URL_PROPERTIES = import.meta.env.VITE_API_URL_PROPERTIES || 'http://localhost:3000';
+const API_BASE_URL_PROPERTIES = import.meta.env.VITE_API_URL_PROPERTIES || 'http://localhost:5001';
 const API_BASE_URL_OTHERS = import.meta.env.VITE_API_URL_OTHERS || 'http://localhost:5001';
 
 //================================================================================
 // HELPER FUNCTIONS
 //================================================================================
+
+/**
+ * Helper to get property image path like All Properties page
+ */
+function getPropertyImagePath(property: any): string {
+  const API_URL = "http://localhost:5001";
+  if (property.images && property.images.length > 0) {
+    if (property.images[0].startsWith('http')) return property.images[0];
+    // Remove '/property_images/' if present
+    const imgName = property.images[0].replace(/^\/property_images\//, '');
+    return `${API_URL}/property_images/${imgName}`;
+  }
+  const name = (property.ProjectName || '').toLowerCase().replace(/\s+/g, '_20');
+  const loc = (property.Area || '').toLowerCase().replace(/\s+/g, '_20');
+  if (!name || !loc) return '/img/placeholder-property.png';
+  // Remove '/property_images/' from the start if present
+  const imgName = `${name}_${loc}_0.jpg`.replace(/^\/property_images\//, '');
+  return `${API_URL}/property_images/${imgName}`;
+}
 
 /**
  * Extracts the plain data object from a potential Mongoose document structure.
@@ -263,7 +282,7 @@ export default function AllPropertiesPage() {
                   <Card className="flex flex-col h-full overflow-hidden rounded-md border-gray-200 hover:shadow-lg transition-shadow duration-300">
                     <div className="relative w-full h-48 bg-gray-200">
                       {propertyData.images && propertyData.images.length > 0 ? (
-                        <img src={`${API_BASE_URL_OTHERS}${propertyData.images[0]}`} alt={propertyData.ProjectName || 'Property Image'} className="w-full h-full object-cover" loading="lazy" />
+                        <img src={getPropertyImagePath(propertyData)} alt={propertyData.ProjectName || 'Property Image'} className="w-full h-full object-cover" loading="lazy" onError={e => { (e.target as HTMLImageElement).src = '/img/placeholder-property.png'; }} />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gray-100"><HomeIcon className="w-12 h-12 text-gray-400" /></div>
                       )}

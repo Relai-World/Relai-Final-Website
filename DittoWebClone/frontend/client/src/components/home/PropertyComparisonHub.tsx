@@ -74,7 +74,7 @@ export default function PropertyComparisonHub() {
             </div>
 
             <div className="pt-4">
-              <Link href="/comparison">
+              <Link href="/compare-properties">
                 <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                   Start Comparing Properties
                   <ArrowRight className="w-5 h-5 ml-2" />

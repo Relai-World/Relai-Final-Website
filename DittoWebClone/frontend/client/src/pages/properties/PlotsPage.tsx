@@ -6,6 +6,25 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { StarRating } from '@/components/ui/star-rating';
 import { apiRequest } from '@/lib/queryClient';
 
+/**
+ * Helper to get property image path with correct port
+ */
+function getPropertyImagePath(property: any): string {
+  const API_URL = "http://localhost:5001";
+  if (property.images && property.images.length > 0) {
+    if (property.images[0].startsWith('http')) return property.images[0];
+    // Remove '/property_images/' if present
+    const imgName = property.images[0].replace(/^\/property_images\//, '');
+    return `${API_URL}/property_images/${imgName}`;
+  }
+  const name = (property.projectName || property.name || '').toLowerCase().replace(/\s+/g, '_20');
+  const loc = (property.location || '').toLowerCase().replace(/\s+/g, '_20');
+  if (!name || !loc) return '/img/placeholder-property.png';
+  // Remove '/property_images/' from the start if present
+  const imgName = `${name}_${loc}_0.jpg`.replace(/^\/property_images\//, '');
+  return `${API_URL}/property_images/${imgName}`;
+}
+
 interface Property {
   id: number;
   propertyId: string;
@@ -106,13 +125,11 @@ export default function PlotsPage() {
                 <div className="relative h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
                   {property.images && property.images.length > 0 ? (
                     <img
-                      src={property.images[0]}
+                      src={getPropertyImagePath(property)}
                       alt={property.projectName || property.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        const placeholder = e.currentTarget.nextElementSibling as HTMLElement;
-                        if (placeholder) placeholder.style.display = 'flex';
+                        (e.target as HTMLImageElement).src = '/img/placeholder-property.png';
                       }}
                     />
                   ) : null}

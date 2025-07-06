@@ -24,6 +24,25 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+/**
+ * Helper to get property image path with correct port
+ */
+function getPropertyImagePath(property: any): string {
+  const API_URL = "http://localhost:5001";
+  if (property.images && property.images.length > 0) {
+    if (property.images[0].startsWith('http')) return property.images[0];
+    // Remove '/property_images/' if present
+    const imgName = property.images[0].replace(/^\/property_images\//, '');
+    return `${API_URL}/property_images/${imgName}`;
+  }
+  const name = (property.ProjectName || '').toLowerCase().replace(/\s+/g, '_20');
+  const loc = (property.Location || '').toLowerCase().replace(/\s+/g, '_20');
+  if (!name || !loc) return '/img/placeholder-property.png';
+  // Remove '/property_images/' from the start if present
+  const imgName = `${name}_${loc}_0.jpg`.replace(/^\/property_images\//, '');
+  return `${API_URL}/property_images/${imgName}`;
+}
+
 interface Property {
   id: string;
   ProjectName: string;
@@ -179,9 +198,10 @@ export default function PropertyResultsPage() {
                           <div className="w-full h-48 lg:h-32 bg-gray-200 rounded-lg flex items-center justify-center">
                             {property.images && property.images.length > 0 ? (
                               <img 
-                                src={property.images[0]} 
+                                src={getPropertyImagePath(property)} 
                                 alt={property.ProjectName}
                                 className="w-full h-full object-cover rounded-lg"
+                                onError={e => { (e.target as HTMLImageElement).src = '/img/placeholder-property.png'; }}
                               />
                             ) : (
                               <Building size={32} className="text-gray-400" />

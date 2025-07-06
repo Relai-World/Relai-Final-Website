@@ -51,8 +51,27 @@ const extractPropertyData = (property: any): any => {
 
 // Define the backend URL for constructing image paths
 // In a real app, this should come from an environment variable (e.g., import.meta.env.VITE_API_URL)
-const API_BASE_URL_PROPERTIES = import.meta.env.VITE_API_URL_PROPERTIES;
-const API_BASE_URL_OTHERS = import.meta.env.VITE_API_URL_OTHERS;
+const API_BASE_URL_PROPERTIES = import.meta.env.VITE_API_URL_PROPERTIES || "http://localhost:5001";
+const API_BASE_URL_OTHERS = import.meta.env.VITE_API_URL_OTHERS || "http://localhost:5001";
+
+/**
+ * Helper to get property image path with correct port
+ */
+function getPropertyImagePath(property: any): string {
+  const API_URL = "http://localhost:5001";
+  if (property.images && property.images.length > 0) {
+    if (property.images[0].startsWith('http')) return property.images[0];
+    // Remove '/property_images/' if present
+    const imgName = property.images[0].replace(/^\/property_images\//, '');
+    return `${API_URL}/property_images/${imgName}`;
+  }
+  const name = (property.ProjectName || property.projectName || '').toLowerCase().replace(/\s+/g, '_20');
+  const loc = (property.Area || property.location || '').toLowerCase().replace(/\s+/g, '_20');
+  if (!name || !loc) return '/img/placeholder-property.png';
+  // Remove '/property_images/' from the start if present
+  const imgName = `${name}_${loc}_0.jpg`.replace(/^\/property_images\//, '');
+  return `${API_URL}/property_images/${imgName}`;
+}
 
 // Helper function to format date from DD-MM-YYYY to MM-YY (e.g., "01-08-2028" -> "08-28")
 const formatPossessionDate = (dateStr?: string): string => {
@@ -126,6 +145,9 @@ export default function AllPropertiesPage() {
       document.title = "Relai | The Ultimate Real Estate Buying Experience";
     };
   }, []);
+  const handleCardClick = (propertyId: string) => {
+    setLocation(`/property/${propertyId}`);
+  };
 
   // Hook for programmatic navigation
   const [_, setLocation] = useLocation();
@@ -450,10 +472,7 @@ export default function AllPropertiesPage() {
     setCurrentPage(1);
   }, [debouncedSearchTerm, propertyType, configurations, constructionStatus, radiusKm]);
   
-  // Click handler for programmatic navigation
-  const handleCardClick = (propertyId: string) => {
-    setLocation(`/property/${propertyId}`);
-  };
+
 
   const resetFilters = () => {
     setSearchTerm('');
@@ -706,15 +725,16 @@ export default function AllPropertiesPage() {
           {properties.map((property: ApiProperty) => {
             const propertyData = extractPropertyData(property);
             return (
-              <div key={propertyData.id || propertyData._id} className="h-full">
+              <div key={propertyData.id || propertyData._id} className="h-full cursor-pointer" onClick={() => handleCardClick(propertyData.id || propertyData._id)}>
                 <Card className="h-full flex flex-col overflow-hidden border-gray-200 group-hover:shadow-xl group-hover:border-blue-300 transition-all duration-300">
                   <div className="relative h-48 w-full overflow-hidden bg-gray-200">
                     {propertyData.images && propertyData.images.length > 0 ? (
                       <img 
-                        src={`${API_BASE_URL_OTHERS}${propertyData.images[0]}`}
+                        src={getPropertyImagePath(propertyData)}
                         alt={propertyData.ProjectName || propertyData.projectName || 'Property Image'}
                         className="w-full h-full object-cover"
                         loading="lazy"
+                        onError={e => { (e.target as HTMLImageElement).src = '/img/placeholder-property.png'; }}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-100">
