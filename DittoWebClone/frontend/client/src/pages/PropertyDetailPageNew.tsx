@@ -52,7 +52,9 @@ interface ConfigurationType {
   facing: string;
   BaseProjectPrice: number;
 }
-const API_BASE_URL = 'http://13.235.48.178:5001'; 
+
+const API_BASE_URL_PROPERTIES = import.meta.env.VITE_API_URL_PROPERTIES || 'http://localhost:5001';
+const API_BASE_URL_OTHERS = import.meta.env.VITE_API_URL_OTHERS || 'http://localhost:5001';
 
 export default function PropertyDetailPageNew() {
   const { id } = useParams<{ id: string }>();
@@ -69,7 +71,7 @@ export default function PropertyDetailPageNew() {
     queryKey: ['/api/properties', id],
     queryFn: async () => {
       console.log(`Fetching property with ID: ${id}`);
-      const response = await fetch(`http://13.235.48.178:5001/api/properties/${encodeURIComponent(id)}`);
+      const response = await fetch(`${API_BASE_URL_OTHERS}/api/properties/${encodeURIComponent(id)}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch property: ${response.statusText}`);
       }
@@ -299,7 +301,7 @@ export default function PropertyDetailPageNew() {
     if (imgPath.startsWith('http')) {
       return imgPath;
     }
-    return `${API_BASE_URL}${imgPath}`;
+    return `${API_BASE_URL_OTHERS}${imgPath}`;
   });
 
   // Parse configurations
