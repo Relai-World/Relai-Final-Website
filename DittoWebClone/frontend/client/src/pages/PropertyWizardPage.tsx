@@ -991,7 +991,7 @@ export default function PropertyWizardPage() {
   const { data: allPropertiesData, isLoading: isLoadingAllProperties } = useQuery({
     queryKey: ["/api/all-properties-wizard"],
     queryFn: async () => {
-      const response = await fetch("http://localhost:5001/api/all-properties");
+      const response = await fetch("http://13.235.48.178:5001/api/all-properties");
       if (!response.ok) throw new Error("Failed to fetch all properties");
       const data = await response.json();
       return data.properties || [];

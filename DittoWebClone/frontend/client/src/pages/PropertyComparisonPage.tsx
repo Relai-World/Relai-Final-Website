@@ -80,7 +80,7 @@ export default function PropertyComparisonPage() {
     queryKey: ['/api/property-by-id', initialPropertyId],
     queryFn: () =>
       initialPropertyId
-        ? apiRequest(`http://localhost:5001/api/property-by-id/${initialPropertyId}`)
+        ? apiRequest(`http://13.235.48.178:5001/api/property-by-id/${initialPropertyId}`)
         : Promise.resolve(undefined),
     enabled: !!initialPropertyId,
   });

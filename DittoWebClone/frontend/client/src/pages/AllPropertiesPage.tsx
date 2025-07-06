@@ -58,7 +58,7 @@ const API_BASE_URL_OTHERS = import.meta.env.VITE_API_URL_OTHERS || "http://local
  * Helper to get property image path with correct port
  */
 function getPropertyImagePath(property: any): string {
-  const API_URL = "http://localhost:5001";
+  const API_URL = "http://13.235.48.178:5001";
   if (property.images && property.images.length > 0) {
     if (property.images[0].startsWith('http')) return property.images[0];
     // Remove '/property_images/' if present

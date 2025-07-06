@@ -52,7 +52,7 @@ interface ConfigurationType {
   facing: string;
   BaseProjectPrice: number;
 }
-const API_BASE_URL = 'http://localhost:5001';
+const API_BASE_URL = 'http://13.235.48.178:5001'; 
 
 export default function PropertyDetailPageNew() {
   const { id } = useParams<{ id: string }>();
@@ -69,7 +69,7 @@ export default function PropertyDetailPageNew() {
     queryKey: ['/api/properties', id],
     queryFn: async () => {
       console.log(`Fetching property with ID: ${id}`);
-      const response = await fetch(`http://localhost:5001/api/properties/${encodeURIComponent(id)}`);
+      const response = await fetch(`http://13.235.48.178:5001/api/properties/${encodeURIComponent(id)}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch property: ${response.statusText}`);
       }

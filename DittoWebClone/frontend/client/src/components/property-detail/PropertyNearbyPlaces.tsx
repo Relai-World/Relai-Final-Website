@@ -102,11 +102,11 @@ export default function PropertyNearbyPlaces({
         
         // Use coordinates if available
         if (latitude && longitude && latitude !== 0 && longitude !== 0) {
-          apiUrl = `http://localhost:5001/api/property-nearby-places?lat=${latitude}&lng=${longitude}`;
+          apiUrl = `http://13.235.48.178:5001/api/property-nearby-places?lat=${latitude}&lng=${longitude}`;
         } 
         // Fall back to property name for geocoding
         else if (propertyName) {
-          apiUrl = `http://localhost:5001/api/property-nearby-places?propertyName=${encodeURIComponent(propertyName)}&location=Hyderabad`;
+          apiUrl = `http://13.235.48.178:5001/api/property-nearby-places?propertyName=${encodeURIComponent(propertyName)}&location=Hyderabad`;
         } 
         // No data available to locate the property
         else {

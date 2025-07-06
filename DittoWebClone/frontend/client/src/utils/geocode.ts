@@ -19,7 +19,7 @@ export async function geocodeAddress(address: string): Promise<GeocodeResult | n
     console.log(`Geocoding address: ${address}`);
     
     // Make API call to server's geocoding endpoint
-    const response = await fetch(`http://localhost:5001/api/geocode?location=${encodeURIComponent(address)}`);
+    const response = await fetch(`http://13.235.48.178:5001/api/geocode?location=${encodeURIComponent(address)}`);
     
     if (!response.ok) {
       console.error(`Geocoding failed for ${address}: ${response.status} ${response.statusText}`);
