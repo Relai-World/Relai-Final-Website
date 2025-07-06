@@ -121,7 +121,7 @@ export default function PropertyDetailPageNew() {
             // Persist coordinates to backend
             const propertyId = (property as any)._id?.$oid || (property as any)._id?.toString?.() || property.id;
             console.log('property._id:', (property as any)._id);
-            fetch(`/api/properties/${propertyId}/set-coords`, {
+            fetch(`${API_BASE_URL_OTHERS}/api/properties/${propertyId}/set-coords`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ latitude: coords.lat, longitude: coords.lon }),

@@ -60,13 +60,37 @@ const app = express();
 // CORS middleware to allow cross-origin requests from any localhost port for development
 app.use(cors({
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    if (!origin || origin.startsWith('http://localhost:') || origin.startsWith('http://65.0.19.97:')) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) {
       callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+      return;
     }
+    
+    // Allow localhost on any port
+    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+      callback(null, true);
+      return;
+    }
+    
+    // Allow specific IP addresses
+    if (origin.startsWith('http://65.0.19.97:')) {
+      callback(null, true);
+      return;
+    }
+    
+    // For development, allow all origins (remove this in production)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Allowing CORS for origin: ${origin}`);
+      callback(null, true);
+      return;
+    }
+    
+    console.log(`Blocking CORS for origin: ${origin}`);
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 }));
 
 // Redirect www.relai.world to relai.world
