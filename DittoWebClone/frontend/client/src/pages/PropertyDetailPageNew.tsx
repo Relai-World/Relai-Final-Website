@@ -55,6 +55,7 @@ interface ConfigurationType {
 
 const API_BASE_URL_PROPERTIES = import.meta.env.VITE_API_URL_PROPERTIES || 'http://localhost:5001';
 const API_BASE_URL_OTHERS = import.meta.env.VITE_API_URL_OTHERS || 'http://localhost:5001';
+const IMAGE_SERVER_URL = import.meta.env.VITE_IMAGE_SERVER_URL || 'http://13.235.48.178:5001';
 
 export default function PropertyDetailPageNew() {
   const { id } = useParams<{ id: string }>();
@@ -301,7 +302,7 @@ export default function PropertyDetailPageNew() {
     if (imgPath.startsWith('http')) {
       return imgPath;
     }
-    return `${API_BASE_URL_OTHERS}${imgPath}`;
+    return `${IMAGE_SERVER_URL}${imgPath}`;
   });
 
   // Parse configurations
