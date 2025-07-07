@@ -39,15 +39,15 @@ const API_BASE_URL_OTHERS = import.meta.env.VITE_API_URL_OTHERS || 'http://local
  * Helper to get property image path like All Properties page
  */
 function getPropertyImagePath(property: any): string {
-  const API_URL = import.meta.env.VITE_API_URL_OTHERS || 'http://localhost:5001';
+  const API_URL = "http://13.235.48.178:5001";
   if (property.images && property.images.length > 0) {
     if (property.images[0].startsWith('http')) return property.images[0];
     // Remove '/property_images/' if present
     const imgName = property.images[0].replace(/^\/property_images\//, '');
     return `${API_URL}/property_images/${imgName}`;
   }
-  const name = (property.ProjectName || '').toLowerCase().replace(/\s+/g, '_20');
-  const loc = (property.Area || '').toLowerCase().replace(/\s+/g, '_20');
+  const name = (property.ProjectName || property.projectName || '').toLowerCase().replace(/\s+/g, '_20');
+  const loc = (property.Area || property.location || '').toLowerCase().replace(/\s+/g, '_20');
   if (!name || !loc) return '/img/placeholder-property.png';
   // Remove '/property_images/' from the start if present
   const imgName = `${name}_${loc}_0.jpg`.replace(/^\/property_images\//, '');
