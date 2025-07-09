@@ -56,6 +56,24 @@ export const validateUserAgent = (req: Request, res: Response, next: NextFunctio
     return next();
   }
   
+  // Allow static asset requests to bypass user agent validation
+  if (req.path.startsWith('/assets/') || 
+      req.path.startsWith('/property_images/') ||
+      req.path.endsWith('.css') ||
+      req.path.endsWith('.js') ||
+      req.path.endsWith('.png') ||
+      req.path.endsWith('.jpg') ||
+      req.path.endsWith('.jpeg') ||
+      req.path.endsWith('.gif') ||
+      req.path.endsWith('.svg') ||
+      req.path.endsWith('.ico') ||
+      req.path.endsWith('.woff') ||
+      req.path.endsWith('.woff2') ||
+      req.path.endsWith('.ttf') ||
+      req.path.endsWith('.eot')) {
+    return next();
+  }
+  
   // Allow requests without user agent from legitimate sources
   if (!userAgent) {
     return next();
